@@ -25,6 +25,10 @@ class PaymentService:
         self.transaction_key = authorize_net_settings.transaction_key
         self.client_key = authorize_net_settings.client_key
         self.sandbox_mode = authorize_net_settings.sandbox_mode
+        print(self.api_login_id)
+        print(self.transaction_key)
+        print(self.client_key)
+        print(self.sandbox_mode)
 
     def get_merchant_auth(self) -> apicontractsv1.merchantAuthenticationType:
         """Get merchant authentication for Authorize.Net API"""
@@ -121,11 +125,11 @@ class PaymentService:
         
         # Get response
         response = controller.getresponse()
-        
+        print("dsdsda",response,"sdklah")
         if response is not None:
             if response.messages.resultCode == "Ok":
                 if hasattr(response.transactionResponse, 'transId'):
-                    transaction_id = response.transactionResponse.transId
+                    transaction_id = str(response.transactionResponse.transId)
                     return True, "Payment processed successfully", transaction_id
                 else:
                     return False, "Payment processed but no transaction ID was returned", None

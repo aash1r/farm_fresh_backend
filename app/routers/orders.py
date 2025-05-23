@@ -1,15 +1,18 @@
-from typing import Any, List, Dict,Optional
+from typing import Any, List, Dict, Optional
 import uuid
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from app.schemas.payment import PaymentRequest, PaymentResponse
+from app.services.payment import payment_service
 from app.core.deps import get_db, get_current_user
 from app.models.user import User
 from app.models.order import Order, OrderItem, OrderStatus, DeliveryType, MangoType
 from app.models.product import Product
-from app.schemas.order import Order as OrderSchema, OrderCreate, OrderUpdate, MangoOrderItem
+from app.schemas.order import Order as OrderSchema, OrderCreate, OrderUpdate, MangoOrderItem, PayAndCreateOrderRequest, PayAndCreateOrderResponse, OrderList
 from app.services.delivery import delivery_service
+from app.services.payment import payment_service
 
 router = APIRouter(prefix="/orders")
 
@@ -57,37 +60,94 @@ def read_orders(
     orders = query.order_by(Order.created_at.desc()).offset(skip).limit(limit).all()
     return orders
 
-@router.get("/{order_id}", response_model=OrderSchema)
-def read_order(
-    order_id: int,
+# Enhanced endpoint for order tracking without validation errors
+@router.get("/my-orders", response_model=List[OrderList])
+def track_orders(
     db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+    status: Optional[str] = None,
+    sort_by: Optional[str] = "created_at",  # Sort by field
+    sort_desc: bool = True,  # Sort direction
     current_user: User = Depends(get_current_user),
 ) -> Any:
-    """Get a specific order by id"""
-    order = db.query(Order).filter(Order.id == order_id).first()
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
+    """Track user's orders with enhanced sorting and filtering"""
+    # Start with base query
+    query = db.query(Order).filter(Order.user_id == current_user.id)
     
-    # Check if the order belongs to the current user
-    if order.user_id != current_user.id and not current_user.is_admin:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    # Apply status filter if provided
+    if status:
+        try:
+            order_status = OrderStatus(status)
+            query = query.filter(Order.status == order_status)
+        except ValueError:
+            # If invalid status is provided, ignore the filter
+            pass
     
-    return order
+    # Apply sorting
+    if sort_by == "total_amount":
+        order_col = Order.total_amount
+    elif sort_by == "status":
+        order_col = Order.status
+    else:  # Default to created_at
+        order_col = Order.created_at
+    
+    # Apply sort direction
+    if sort_desc:
+        query = query.order_by(order_col.desc())
+    else:
+        query = query.order_by(order_col.asc())
+    
+    # Apply pagination and execute query
+    orders = query.offset(skip).limit(limit).all()
+    return orders
 
-@router.post("/", response_model=OrderSchema)
+# @router.get("/{order_id}", response_model=OrderSchema)
+# def read_order(
+#     order_id: int,
+#     db: Session = Depends(get_db),
+#     current_user: User = Depends(get_current_user),
+# ) -> Any:
+#     """Get a specific order by id"""
+#     order = db.query(Order).filter(Order.id == order_id).first()
+#     if not order:
+#         raise HTTPException(status_code=404, detail="Order not found")
+    
+#     # Check if the order belongs to the current user
+#     if order.user_id != current_user.id and not current_user.is_admin:
+#         raise HTTPException(status_code=403, detail="Not enough permissions")
+    
+#     return order
+
+@router.post("/", response_model=PayAndCreateOrderResponse)
 def create_order(
     *,
     db: Session = Depends(get_db),
-    order_in: OrderCreate,
+    request: PayAndCreateOrderRequest,
     current_user: User = Depends(get_current_user),
 ) -> Any:
     """Create new order"""
+
+    try:
+        success, message, transaction_id = payment_service.process_payment(
+            amount=request.amount,
+            card_number=request.card_number,
+            expiration_date=request.expiration_date,
+            card_code=request.card_code,
+            first_name=request.first_name,
+            last_name=request.last_name,
+            order_description=request.order_description,
+            invoice_number=request.invoice_number,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Payment processing error: {str(e)}")
+
+
     order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
-    
     total_amount = 0.0
     order_items = []
     
-    for item in order_in.items:
+    for item in request.items:
         product = db.query(Product).filter(Product.id == item.product_id).first()
         if not product:
             raise HTTPException(status_code=404, detail=f"Product with id {item.product_id} not found")
@@ -112,22 +172,22 @@ def create_order(
         db.add(product)
     
     # Validate delivery options for mango orders
-    if order_in.is_mango_delivery:
-        if not order_in.mango_items or len(order_in.mango_items) == 0:
+    if request.is_mango_delivery:
+        if not request.mango_items or len(request.mango_items) == 0:
             raise HTTPException(status_code=400, detail="Mango items are required for mango delivery")
             
         # Check for zero quantities
-        zero_quantity_items = [item for item in order_in.mango_items if item.quantity <= 0]
+        zero_quantity_items = [item for item in request.mango_items if item.quantity <= 0]
         if zero_quantity_items:
             raise HTTPException(status_code=400, detail="Quantity must be greater than zero for all mango items")
             
         # Extract mango types and quantities
-        mango_types = [item.mango_type for item in order_in.mango_items]
-        quantities = [item.quantity for item in order_in.mango_items]
+        mango_types = [item.mango_type for item in request.mango_items]
+        quantities = [item.quantity for item in request.mango_items]
         
         # Validate mango order based on delivery type
         is_valid, error_message, calculated_price = delivery_service.validate_mango_order(
-            order_in.delivery_type.value, mango_types, quantities
+            request.delivery_type.value, mango_types, quantities
         )
         
         if not is_valid:
@@ -145,9 +205,9 @@ def create_order(
         #     if not valid_airport:
         #         raise HTTPException(status_code=400, detail=f"Invalid airport code: {order_in.airport_code}")
         
-        elif order_in.delivery_type == DeliveryType.DOORSTEP:
+        elif request.delivery_type == DeliveryType.DOORSTEP:
             # Validate state and zipcode
-            is_valid, error_message = delivery_service.validate_zipcode(order_in.shipping_zip, order_in.shipping_state)
+            is_valid, error_message = delivery_service.validate_zipcode(request.shipping_zip, request.shipping_state)
             if not is_valid:
                 raise HTTPException(status_code=400, detail=error_message)
                 
@@ -169,7 +229,7 @@ def create_order(
                 )
                 
             # Update price based on state for doorstep delivery
-            calculated_price = delivery_service.calculate_doorstep_price(order_in.shipping_state, total_quantity)
+            calculated_price = delivery_service.calculate_doorstep_price(request.shipping_state, total_quantity)
             
         # Override the total amount with the calculated price for mango orders
         total_amount = calculated_price
@@ -179,14 +239,14 @@ def create_order(
         order_number=order_number,
         total_amount=total_amount,
         status=OrderStatus.PROCESSING,
-        delivery_type=order_in.delivery_type,
-        is_mango_delivery=order_in.is_mango_delivery,
-        shipping_zip=order_in.shipping_zip,
-        shipping_address=order_in.shipping_address,
-        shipping_state=order_in.shipping_state,
-        airport_code=order_in.airport_code,
-        airport_name=order_in.airport_name,
-        payment_id=order_in.payment_id,
+        delivery_type=request.delivery_type,
+        is_mango_delivery=request.is_mango_delivery,
+        shipping_zip=request.shipping_zip,
+        shipping_address=request.shipping_address,
+        shipping_state=request.shipping_state,
+        airport_code=request.airport_code,
+        airport_name=request.airport_name,
+        payment_id=transaction_id,  # Use the transaction_id from payment processing
         user_id=current_user.id,
     )
     db.add(order)
@@ -194,9 +254,9 @@ def create_order(
     db.refresh(order)
     
     # Create order items
-    if order_in.is_mango_delivery and order_in.mango_items:
+    if request.is_mango_delivery and request.mango_items:
         # For mango orders, create order items based on mango_items
-        for mango_item in order_in.mango_items:
+        for mango_item in request.mango_items:
             # Find the product ID for this mango type
             product = db.query(Product).filter(Product.type == mango_item.mango_type).first()
             if not product:
@@ -214,7 +274,7 @@ def create_order(
             
             # For simplicity, we'll calculate a per-box price
             # This is a simplification as different mango types might have different prices
-            total_boxes = sum(item.quantity for item in order_in.mango_items)
+            total_boxes = sum(item.quantity for item in request.mango_items)
             unit_price = calculated_price / total_boxes if total_boxes > 0 else 0
             
             # Create order item
@@ -240,7 +300,57 @@ def create_order(
     db.commit()
     db.refresh(order)
     
-    return order
+    # Convert SQLAlchemy model to Pydantic model for serialization
+    order_schema = OrderSchema.model_validate(order)
+    
+    return PayAndCreateOrderResponse(
+            success=success,
+            message=message,
+            order=order_schema,
+            transaction_id=transaction_id
+        )    
+
+# Enhanced endpoint for order tracking
+@router.get("/my-orders", response_model=List[OrderSchema])
+def track_orders(
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+    status: Optional[str] = None,
+    sort_by: Optional[str] = "created_at",  # New: sort by field
+    sort_desc: bool = True,  # New: sort direction
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    """Track user's orders with enhanced sorting and filtering"""
+    # Start with base query
+    query = db.query(Order).filter(Order.user_id == current_user.id)
+    
+    # Apply status filter if provided
+    if status:
+        try:
+            order_status = OrderStatus(status)
+            query = query.filter(Order.status == order_status)
+        except ValueError:
+            # If invalid status is provided, ignore the filter
+            pass
+    
+    # Apply sorting
+    if sort_by == "total_amount":
+        order_col = Order.total_amount
+    elif sort_by == "status":
+        order_col = Order.status
+    else:  # Default to created_at
+        order_col = Order.created_at
+    
+    # Apply sort direction
+    if sort_desc:
+        query = query.order_by(order_col.desc())
+    else:
+        query = query.order_by(order_col.asc())
+    
+    # Apply pagination and execute query
+    orders = query.offset(skip).limit(limit).all()
+    return orders
 
 @router.put("/{order_id}", response_model=OrderSchema)
 def update_order_status(
@@ -308,3 +418,4 @@ def cancel_order(
     db.refresh(order)
     
     return order
+

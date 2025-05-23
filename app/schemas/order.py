@@ -1,4 +1,5 @@
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
+from app.schemas.payment import PaymentRequest
 from pydantic import BaseModel, validator, Field
 from datetime import datetime
 from app.models.order import OrderStatus, DeliveryType, MangoType
@@ -26,6 +27,16 @@ class OrderItem(OrderItemInDBBase):
     product_name: Optional[str] = None
     variation_name: Optional[str] = None
 
+# ---
+# Combined Payment + Order Creation Schemas
+# ---
+
+class PayAndCreateOrderResponse(BaseModel):
+    success: bool
+    message: str
+    order: Optional[Any] = None
+    transaction_id: Optional[str] = None
+
 # Order Schemas
 class MangoOrderItem(BaseModel):
     mango_type: str
@@ -41,9 +52,24 @@ class MangoOrderItem(BaseModel):
             )
         return v
 
+
+class PayAndCreateOrderRequest(PaymentRequest, BaseModel):
+    items: List[OrderItemCreate]
+    delivery_type: DeliveryType
+    shipping_zip: Optional[str] = None
+    is_mango_delivery: bool = False
+    payment_id: Optional[str] = None  # Will be populated from transaction_id
+    shipping_address: Optional[str] = None
+    shipping_state: Optional[str] = None
+    airport_code: Optional[str] = None
+    airport_name: Optional[str] = None
+    phone: Optional[str] = None
+    mango_items: Optional[List[MangoOrderItem]] = None
+
+
 class OrderBase(BaseModel):
     delivery_type: DeliveryType
-    shipping_zip: str
+    shipping_zip: Optional[str] = None
     payment_id: str
     is_mango_delivery: bool = False
     
@@ -93,3 +119,25 @@ class OrderInDBBase(OrderBase):
 
 class Order(OrderInDBBase):
     items: List[OrderItem] = []
+
+# Schema for listing orders without validation
+class OrderList(BaseModel):
+    id: int
+    order_number: str
+    total_amount: float
+    status: OrderStatus
+    delivery_type: DeliveryType
+    is_mango_delivery: bool = False
+    shipping_zip: Optional[str] = None
+    shipping_address: Optional[str] = None
+    shipping_state: Optional[str] = None
+    airport_code: Optional[str] = None
+    airport_name: Optional[str] = None
+    payment_id: Optional[str] = None
+    user_id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+    items: List[OrderItem] = []
+    
+    class Config:
+        from_attributes = True

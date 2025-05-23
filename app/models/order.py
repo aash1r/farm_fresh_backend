@@ -34,7 +34,7 @@ class Order(Base):
     is_mango_delivery = Column(Boolean, default=False)  # Flag to identify mango deliveries
     
     # For both delivery types
-    shipping_zip = Column(String, nullable=False)
+    shipping_zip = Column(String, nullable=True)
     
     # For doorstep delivery
     shipping_address = Column(String, nullable=True)
