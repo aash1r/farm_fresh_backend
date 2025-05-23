@@ -17,6 +17,8 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="Farm Fresh Shop API",
     description="API for Farm Fresh Shop application",
+    docs_url="/api/v1/docs",
+    openapi_url="/api/v1/openapi.json",
     version="1.0.0"
 )
 
