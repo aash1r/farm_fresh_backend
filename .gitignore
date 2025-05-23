@@ -11,3 +11,5 @@ PRICE 2025.xlsx
 .~lock.PRICE 2025.xlsx#
 /app/core/payment_config.py
 /app/core/s3_config.py
+venv/
+__pycache__/

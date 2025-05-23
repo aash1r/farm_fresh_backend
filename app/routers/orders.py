@@ -134,16 +134,16 @@ def create_order(
             raise HTTPException(status_code=400, detail=error_message)
             
         # Additional validation based on delivery type
-        if order_in.delivery_type == DeliveryType.PICKUP:
-            # Validate airport code
-            airports = delivery_service.get_airports()
-            valid_airport = False
-            for airport in airports:
-                if airport['code'] == order_in.airport_code:
-                    valid_airport = True
-                    break
-            if not valid_airport:
-                raise HTTPException(status_code=400, detail=f"Invalid airport code: {order_in.airport_code}")
+        # if order_in.delivery_type == DeliveryType.PICKUP:
+        #     # Validate airport code
+        #     airports = delivery_service.get_airports()
+        #     valid_airport = False
+        #     for airport in airports:
+        #         if airport['code'] == order_in.airport_code:
+        #             valid_airport = True
+        #             break
+        #     if not valid_airport:
+        #         raise HTTPException(status_code=400, detail=f"Invalid airport code: {order_in.airport_code}")
         
         elif order_in.delivery_type == DeliveryType.DOORSTEP:
             # Validate state and zipcode

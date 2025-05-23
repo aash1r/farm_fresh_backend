@@ -7,7 +7,7 @@ from app.models.order import OrderStatus, DeliveryType, MangoType
 class OrderItemBase(BaseModel):
     product_id: int
     quantity: int
-    unit_price: float
+    unit_price: Optional[float] = None
     total_price: float
     mango_type: Optional[str] = None  # For mango orders
 
@@ -54,19 +54,19 @@ class OrderBase(BaseModel):
     airport_name: Optional[str] = None
     
     # Mango-specific fields
-    mango_items: Optional[List[MangoOrderItem]] = None
+    # mango_items: Optional[List[MangoOrderItem]] = None
     
-    @validator('shipping_address', 'shipping_state')
+    @validator('shipping_state')
     def validate_doorstep_fields(cls, v, values):
         if values.get('delivery_type') == DeliveryType.DOORSTEP and v is None:
-            field_name = 'shipping_address' if v is None else 'shipping_state'
+            field_name = 'shipping_state' if v is None else 'shipping_address'
             raise ValueError(f'{field_name} is required for doorstep delivery')
         return v
     
-    @validator('airport_code', 'airport_name')
+    @validator('airport_name')
     def validate_pickup_fields(cls, v, values):
         if values.get('delivery_type') == DeliveryType.PICKUP and v is None:
-            field_name = 'airport_code' if v is None else 'airport_name'
+            field_name = 'airport_name' if v is None else 'airport_code'
             raise ValueError(f'{field_name} is required for pickup delivery')
         return v
 
@@ -83,7 +83,7 @@ class OrderInDBBase(OrderBase):
     order_number: str
     total_amount: float
     status: OrderStatus
-    payment_status: str
+    # payment_status: str
     user_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None

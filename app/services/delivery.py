@@ -184,7 +184,7 @@ class DeliveryService:
             if quantity == 2:
                 return 69.99
             elif quantity == 4:
-                return 135.0
+                return 135.99
                 
         # Should never reach here
         return 0.0

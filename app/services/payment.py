@@ -80,6 +80,10 @@ class PaymentService:
         if not invoice_number:
             invoice_number = f"INV-{uuid.uuid4().hex[:8].upper()}"
         
+        # Ensure invoice number is not too long (max 20 characters for Authorize.Net)
+        if invoice_number and len(invoice_number) > 20:
+            invoice_number = invoice_number[:20]
+            
         order = apicontractsv1.orderType()
         order.invoiceNumber = invoice_number
         order.description = order_description
@@ -88,7 +92,8 @@ class PaymentService:
         # Set customer information
         customer_data = apicontractsv1.customerDataType()
         customer_data.type = "individual"
-        customer_data.id = str(uuid.uuid4())
+        # Ensure customer ID is not too long (max 20 characters)
+        customer_data.id = uuid.uuid4().hex[:20]
         customer_data.email = ""  # Could be added as a parameter if needed
         transaction.customer = customer_data
         
@@ -101,7 +106,8 @@ class PaymentService:
         # Create request and controller
         create_transaction = apicontractsv1.createTransactionRequest()
         create_transaction.merchantAuthentication = self.get_merchant_auth()
-        create_transaction.refId = str(uuid.uuid4())
+        # Ensure refId is not too long (max 20 characters)
+        create_transaction.refId = uuid.uuid4().hex[:20]
         create_transaction.transactionRequest = transaction
         
         # Execute request
