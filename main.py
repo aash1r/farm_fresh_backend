@@ -19,7 +19,8 @@ app = FastAPI(
     description="API for Farm Fresh Shop application",
     docs_url="/api/v1/docs",
     openapi_url="/api/v1/openapi.json",
-    version="1.0.0"
+    version="1.0.0",
+    redirect_slashes=True
 )
 
 # Add CORS middleware

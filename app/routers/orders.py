@@ -14,7 +14,7 @@ from app.schemas.order import Order as OrderSchema, OrderCreate, OrderUpdate, Ma
 from app.services.delivery import delivery_service
 from app.services.payment import payment_service
 
-router = APIRouter(prefix="/orders")
+router = APIRouter(prefix="/orders",redirect_slashes=False)
 
 @router.get("/", response_model=List[OrderSchema])
 def read_orders(
