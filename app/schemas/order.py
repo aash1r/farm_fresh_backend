@@ -70,7 +70,7 @@ class PayAndCreateOrderRequest(PaymentRequest, BaseModel):
 class OrderBase(BaseModel):
     delivery_type: DeliveryType
     shipping_zip: Optional[str] = None
-    payment_id: str
+    payment_id: Optional[str] = None
     is_mango_delivery: bool = False
     
     # Optional fields based on delivery type
