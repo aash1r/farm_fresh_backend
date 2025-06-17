@@ -30,7 +30,6 @@ async def payment_checkout(
         raise HTTPException(status_code=401, detail="Invalid or missing Authorization header")
     
     token = auth_header.split(" ")[1]
-    print(token, amount)
     url = f"https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html?amount={amount}&auth_token={token}"
     return {"checkout_url": url}
 
