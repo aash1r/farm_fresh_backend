@@ -22,11 +22,17 @@ router = APIRouter(prefix="/payments")
 @router.get("/checkout")
 async def payment_checkout(
     amount: float,
+    request: Request,
     current_user: User = Depends(get_current_user),
 ):
-    """Redirect to hosted S3 HTML file with params"""
-    url = f"https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html?amount={amount}&user_id={current_user.id}"
-    return RedirectResponse(url)
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid or missing Authorization header")
+    
+    token = auth_header.split(" ")[1]
+    print(token, amount)
+    url = f"https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html?amount={amount}&auth_token={token}"
+    return {"checkout_url": url}
 
 @router.post("/process-token", response_model=PaymentResponse)
 async def process_payment_token(

@@ -57,9 +57,9 @@
   // Amount injected by backend as string to avoid lint errors, then parsed
   const urlParams = new URLSearchParams(window.location.search);
   const AMOUNT = parseFloat(urlParams.get('amount'))||0;
-  const USER_ID = urlParams.get("user_id");
+  const AUTH_TOKEN = urlParams.get("auth_token");
   const PAYMENT_ENDPOINT = "https://api.farmfreshshop.com/api/v1/orders/"
-  console.log("Parsed amount:", AMOUNT, "User ID:", USER_ID);
+  console.log("Parsed amount:", AMOUNT, "User ID:", AUTH_TOKEN);
 
 //   "/api/v1/payments/process-token";
 
@@ -108,7 +108,8 @@
       try{
           const res = await fetch(PAYMENT_ENDPOINT, {
               method: 'POST',
-              headers: {'Content-Type':'application/json'},
+              headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${AUTH_TOKEN}`},
+
               body: JSON.stringify({
                   amount: AMOUNT,
                   dataDescriptor: tokenData.dataDescriptor,
