@@ -115,7 +115,13 @@
                   dataDescriptor: tokenData.dataDescriptor,
                   dataValue: tokenData.dataValue,
                   first_name: document.getElementById('firstName').value,
-                  last_name: document.getElementById('lastName').value
+                  last_name: document.getElementById('lastName').value,
+                  items: [],  // you may need to inject cart items here from the app context
+                  delivery_type: "pickup", // example placeholder
+                  shipping_zip: "12345",
+                  shipping_address: "123 Mango Street",
+                  shipping_state: "CA",
+                  phone: "1234567890"
               })
           });
           const data = await res.json();
@@ -126,6 +132,7 @@
           }else{
               const failMsg = data.message || 'Payment failed';
               setStatus(failMsg);
+              console.error("Payment Failed:", failMsg);
               window.location.href = `farmfresh://payment/fail?msg=${encodeURIComponent(failMsg)}`;
           }
       }catch(err){
