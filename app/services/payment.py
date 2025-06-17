@@ -162,8 +162,8 @@ class PaymentService:
         data_value: str,
         first_name: str,
         last_name: str,
-        order_description: str = "Farm Fresh Shop Order",
-        invoice_number: Optional[str] = None,
+        # order_description: str = "Farm Fresh Shop Order",
+        # invoice_number: Optional[str] = None,
     ) -> Tuple[bool, str, Optional[str]]:
         """Process a payment using the opaque token from Accept.js
 
@@ -201,13 +201,13 @@ class PaymentService:
         transaction_request.payment = payment
         transaction_request.customer = customer
         transaction_request.billTo = bill_to
-        if order_description:
-            transaction_request.order = apicontractsv1.orderType()
-            transaction_request.order.description = order_description
-        if invoice_number:
-            if not transaction_request.order:
-                transaction_request.order = apicontractsv1.orderType()
-            transaction_request.order.invoiceNumber = invoice_number[:20]
+        # if order_description:
+        #     transaction_request.order = apicontractsv1.orderType()
+        #     transaction_request.order.description = order_description
+        # if invoice_number:
+        #     if not transaction_request.order:
+        #         transaction_request.order = apicontractsv1.orderType()
+        #     transaction_request.order.invoiceNumber = invoice_number[:20]
 
         request = apicontractsv1.createTransactionRequest()
         request.merchantAuthentication = merchant_auth
