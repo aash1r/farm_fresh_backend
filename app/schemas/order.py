@@ -27,9 +27,6 @@ class OrderItem(OrderItemInDBBase):
     product_name: Optional[str] = None
     variation_name: Optional[str] = None
 
-# ---
-# Combined Payment + Order Creation Schemas
-# ---
 
 class PayAndCreateOrderResponse(BaseModel):
     success: bool
@@ -56,14 +53,14 @@ class MangoOrderItem(BaseModel):
 class PayAndCreateOrderRequest(PaymentRequest, BaseModel):
     items: List[OrderItemCreate]
     delivery_type: DeliveryType
-    shipping_zip: Optional[str] = None
+    shipping_zip: str
     is_mango_delivery: bool = False
     payment_id: Optional[str] = None  # Will be populated from transaction_id
-    shipping_address: Optional[str] = None
-    shipping_state: Optional[str] = None
+    shipping_address: str
+    shipping_state: str
     airport_code: Optional[str] = None
     airport_name: Optional[str] = None
-    phone: Optional[str] = None
+    phone: str 
     mango_items: Optional[List[MangoOrderItem]] = None
 
 

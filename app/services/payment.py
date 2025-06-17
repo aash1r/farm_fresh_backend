@@ -37,109 +37,111 @@ class PaymentService:
         merchant_auth.transactionKey = self.transaction_key
         return merchant_auth
 
-    def process_payment(
-        self,
-        amount: float,
-        card_number: str,
-        expiration_date: str,  # Format: "MMYY"
-        card_code: str,
-        first_name: str,
-        last_name: str,
-        order_description: str = "Farm Fresh Shop Order",
-        invoice_number: Optional[str] = None,
-    ) -> Tuple[bool, str, Optional[str]]:
-        """Process a payment through Authorize.Net
+    # def process_payment(
+    #     self,
+    #     amount: float,
+    #     card_number: str,
+    #     expiration_date: str,  # Format: "MMYY"
+    #     card_code: str,
+    #     first_name: str,
+    #     last_name: str,
+    #     order_description: str = "Farm Fresh Shop Order",
+    #     invoice_number: Optional[str] = None,
+    # ) -> Tuple[bool, str, Optional[str]]:
+    #     """Process a payment through Authorize.Net
         
-        Args:
-            amount: The payment amount
-            card_number: Credit card number
-            expiration_date: Expiration date in MMYY format
-            card_code: CVV/security code
-            first_name: Customer's first name
-            last_name: Customer's last name
-            order_description: Description of the order
-            invoice_number: Optional invoice number
+    #     Args:
+    #         amount: The payment amount
+    #         card_number: Credit card number
+    #         expiration_date: Expiration date in MMYY format
+    #         card_code: CVV/security code
+    #         first_name: Customer's first name
+    #         last_name: Customer's last name
+    #         order_description: Description of the order
+    #         invoice_number: Optional invoice number
             
-        Returns:
-            Tuple containing:
-            - success: Boolean indicating if payment was successful
-            - message: Message describing the result
-            - transaction_id: Transaction ID if successful, None otherwise
-        """
-        # Create a transaction
-        transaction = apicontractsv1.transactionRequestType()
-        transaction.transactionType = "authCaptureTransaction"
-        transaction.amount = str(amount)
+    #     Returns:
+    #         Tuple containing:
+    #         - success: Boolean indicating if payment was successful
+    #         - message: Message describing the result
+    #         - transaction_id: Transaction ID if successful, None otherwise
+    #     """
+    #     # Create a transaction
+    #     transaction = apicontractsv1.transactionRequestType()
+    #     transaction.transactionType = "authCaptureTransaction"
+    #     transaction.amount = str(amount)
         
-        # Set payment information
-        payment = apicontractsv1.paymentType()
-        credit_card = apicontractsv1.creditCardType()
-        credit_card.cardNumber = card_number
-        credit_card.expirationDate = expiration_date
-        credit_card.cardCode = card_code
-        payment.creditCard = credit_card
-        transaction.payment = payment
+    #     # Set payment information
+    #     payment = apicontractsv1.paymentType()
+    #     credit_card = apicontractsv1.creditCardType()
+    #     credit_card.cardNumber = card_number
+    #     credit_card.expirationDate = expiration_date
+    #     credit_card.cardCode = card_code
+    #     payment.creditCard = credit_card
+    #     transaction.payment = payment
         
-        # Set order information
-        if not invoice_number:
-            invoice_number = f"INV-{uuid.uuid4().hex[:8].upper()}"
+    #     # Set order information
+    #     if not invoice_number:
+    #         invoice_number = f"INV-{uuid.uuid4().hex[:8].upper()}"
         
-        # Ensure invoice number is not too long (max 20 characters for Authorize.Net)
-        if invoice_number and len(invoice_number) > 20:
-            invoice_number = invoice_number[:20]
+    #     # Ensure invoice number is not too long (max 20 characters for Authorize.Net)
+    #     if invoice_number and len(invoice_number) > 20:
+    #         invoice_number = invoice_number[:20]
             
-        order = apicontractsv1.orderType()
-        order.invoiceNumber = invoice_number
-        order.description = order_description
-        transaction.order = order
+    #     order = apicontractsv1.orderType()
+    #     order.invoiceNumber = invoice_number
+    #     order.description = order_description
+    #     transaction.order = order
         
-        # Set customer information
-        customer_data = apicontractsv1.customerDataType()
-        customer_data.type = "individual"
-        # Ensure customer ID is not too long (max 20 characters)
-        customer_data.id = uuid.uuid4().hex[:20]
-        customer_data.email = ""  # Could be added as a parameter if needed
-        transaction.customer = customer_data
+    #     # Set customer information
+    #     customer_data = apicontractsv1.customerDataType()
+    #     customer_data.type = "individual"
+    #     # Ensure customer ID is not too long (max 20 characters)
+    #     customer_data.id = uuid.uuid4().hex[:20]
+    #     customer_data.email = ""  # Could be added as a parameter if needed
+    #     transaction.customer = customer_data
         
-        # Set billing information
-        billing_address = apicontractsv1.customerAddressType()
-        billing_address.firstName = first_name
-        billing_address.lastName = last_name
-        transaction.billTo = billing_address
+    #     # Set billing information
+    #     billing_address = apicontractsv1.customerAddressType()
+    #     billing_address.firstName = first_name
+    #     billing_address.lastName = last_name
+    #     transaction.billTo = billing_address
+
+    #     #verify card details, if verified then tokenize the card if not verfied then throw response to frontend that card is not valid
+
+    #     # Create request and controller
+    #     create_transaction = apicontractsv1.createTransactionRequest()
+    #     create_transaction.merchantAuthentication = self.get_merchant_auth()
+    #     # Ensure refId is not too long (max 20 characters)
+    #     create_transaction.refId = uuid.uuid4().hex[:20]
+    #     create_transaction.transactionRequest = transaction
         
-        # Create request and controller
-        create_transaction = apicontractsv1.createTransactionRequest()
-        create_transaction.merchantAuthentication = self.get_merchant_auth()
-        # Ensure refId is not too long (max 20 characters)
-        create_transaction.refId = uuid.uuid4().hex[:20]
-        create_transaction.transactionRequest = transaction
-        
-        # Execute request
-        controller = createTransactionController(create_transaction)
-        if self.sandbox_mode:
-            controller.setenvironment(constants.SANDBOX)
-        else:
-            controller.setenvironment(constants.PRODUCTION)
+    #     # Execute request
+    #     controller = createTransactionController(create_transaction)
+    #     if self.sandbox_mode:
+    #         controller.setenvironment(constants.SANDBOX)
+    #     else:
+    #         controller.setenvironment(constants.PRODUCTION)
             
-        controller.execute()
+    #     controller.execute()
         
-        # Get response
-        response = controller.getresponse()
-        print("dsdsda",response,"sdklah")
-        if response is not None:
-            if response.messages.resultCode == "Ok":
-                if hasattr(response.transactionResponse, 'transId'):
-                    transaction_id = str(response.transactionResponse.transId)
-                    return True, "Payment processed successfully", transaction_id
-                else:
-                    return False, "Payment processed but no transaction ID was returned", None
-            else:
-                error_message = f"Payment failed: {response.messages.message[0].text}"
-                if hasattr(response, 'transactionResponse') and hasattr(response.transactionResponse, 'errors'):
-                    error_message += f" - {response.transactionResponse.errors.error[0].errorText}"
-                return False, error_message, None
-        else:
-            return False, "No response from payment gateway", None
+    #     # Get response
+    #     response = controller.getresponse()
+    #     print("dsdsda",response,"sdklah")
+    #     if response is not None:
+    #         if response.messages.resultCode == "Ok":
+    #             if hasattr(response.transactionResponse, 'transId'):
+    #                 transaction_id = str(response.transactionResponse.transId)
+    #                 return True, "Payment processed successfully", transaction_id
+    #             else:
+    #                 return False, "Payment processed but no transaction ID was returned", None
+    #         else:
+    #             error_message = f"Payment failed: {response.messages.message[0].text}"
+    #             if hasattr(response, 'transactionResponse') and hasattr(response.transactionResponse, 'errors'):
+    #                 error_message += f" - {response.transactionResponse.errors.error[0].errorText}"
+    #             return False, error_message, None
+    #     else:
+    #         return False, "No response from payment gateway", None
 
     def get_client_token(self) -> Dict[str, str]:
         """Get client token for client-side payment processing
@@ -151,6 +153,84 @@ class PaymentService:
             "clientKey": self.client_key,
             "apiLoginID": self.api_login_id
         }
+
+
+    def process_payment_token(
+        self,
+        amount: float,
+        data_descriptor: str,
+        data_value: str,
+        first_name: str,
+        last_name: str,
+        order_description: str = "Farm Fresh Shop Order",
+        invoice_number: Optional[str] = None,
+    ) -> Tuple[bool, str, Optional[str]]:
+        """Process a payment using the opaque token from Accept.js
+
+        Args:
+            amount: Transaction amount
+            data_descriptor: Opaque data descriptor from Accept.js
+            data_value: Opaque data value from Accept.js
+            first_name: Customer first name
+            last_name: Customer last name
+        """
+
+        merchant_auth = self.get_merchant_auth()
+
+        # Create opaque payment type
+        opaque = apicontractsv1.opaqueDataType()
+        opaque.dataDescriptor = data_descriptor
+        opaque.dataValue = data_value
+
+        payment = apicontractsv1.paymentType()
+        payment.opaqueData = opaque
+
+        # Customer information
+        customer = apicontractsv1.customerDataType()
+        customer.id = str(uuid.uuid4())
+        customer.email = f"{first_name.lower()}.{last_name.lower()}@example.com"
+
+        # Billing name (optional but good practice)
+        bill_to = apicontractsv1.customerAddressType()
+        bill_to.firstName = first_name
+        bill_to.lastName = last_name
+
+        transaction_request = apicontractsv1.transactionRequestType()
+        transaction_request.transactionType = "authCaptureTransaction"
+        transaction_request.amount = amount
+        transaction_request.payment = payment
+        transaction_request.customer = customer
+        transaction_request.billTo = bill_to
+        if order_description:
+            transaction_request.order = apicontractsv1.orderType()
+            transaction_request.order.description = order_description
+        if invoice_number:
+            if not transaction_request.order:
+                transaction_request.order = apicontractsv1.orderType()
+            transaction_request.order.invoiceNumber = invoice_number
+
+        request = apicontractsv1.createTransactionRequest()
+        request.merchantAuthentication = merchant_auth
+        request.transactionRequest = transaction_request
+
+        controller = createTransactionController(request)
+        if self.sandbox_mode:
+            controller.setenvironment(constants.SANDBOX)
+        controller.execute()
+
+        response = controller.getresponse()
+        logger.info(f"Authorize.Net response: {response}")
+
+        if response and response.messages.resultCode == "Ok":
+            trans_id = getattr(response.transactionResponse, "transId", None)
+            return True, "Payment processed successfully", str(trans_id)
+        else:
+            message = "Payment failed"
+            try:
+                message = response.transactionResponse.errors.error[0].errorText  # type: ignore
+            except Exception:
+                pass
+            return False, message, None
 
 
 # Create a singleton instance

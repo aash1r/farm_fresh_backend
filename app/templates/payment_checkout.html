@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Fresh Shop – Payment</title>
+  <script type="text/javascript" src="https://jstest.authorize.net/v1/Accept.js" charset="utf-8"></script>
+  <style>
+      body{font-family: Arial, Helvetica, sans-serif;margin:0;padding:0;background:#fafafa;color:#333}
+      .container{max-width:480px;margin:0 auto;padding:24px}
+      h2{text-align:center;margin-bottom:16px}
+      .field{margin-bottom:12px;display:flex;flex-direction:column}
+      .field label{font-size:14px;margin-bottom:4px}
+      .field input{padding:10px;font-size:16px;border:1px solid #ccc;border-radius:4px}
+      button{width:100%;padding:14px;margin-top:12px;background:#28a745;border:none;color:#fff;font-size:16px;border-radius:4px;cursor:pointer}
+      button:disabled{opacity:.6;cursor:not-allowed}
+      #status{margin-top:16px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="container">
+      <h2>Complete Payment</h2>
+      <!-- <p style="text-align:center">Amount: <strong>${{ amount }}</strong></p> -->
+      <form id="paymentForm" onsubmit="event.preventDefault();sendPayment();">
+          <div class="field">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" required>
+          </div>
+          <div class="field">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" required>
+          </div>
+          <div class="field">
+              <label for="cardNumber">Card Number</label>
+              <input type="text" id="cardNumber" autocomplete="cc-number" required>
+          </div>
+          <div class="field">
+              <label for="expMonth">Expiry Month (MM)</label>
+              <input type="text" id="expMonth" maxlength="2" required>
+          </div>
+          <div class="field">
+              <label for="expYear">Expiry Year (YYYY)</label>
+              <input type="text" id="expYear" maxlength="4" required>
+          </div>
+          <div class="field">
+              <label for="cardCode">CVC</label>
+              <input type="text" id="cardCode" maxlength="4" required>
+          </div>
+          <button id="payButton" type="submit">Pay</button>
+      </form>
+      <div id="status"></div>
+  </div>
+
+<script>
+  const CLIENT_KEY = "7z7qqNqC857FB2x24keSAA4dbA2yUPh9x2UHtdkt4kR54AG5HVPUKYa3r9RTRdjL";
+  const API_LOGIN_ID = "4td4BU4F";
+  // Amount injected by backend as string to avoid lint errors, then parsed
+  const urlParams = new URLSearchParams(window.location.search);
+  const AMOUNT = parseFloat(urlParams.get('amount'))||0;
+  const USER_ID = urlParams.get("user_id");
+  const PAYMENT_ENDPOINT = "https://api.farmfreshshop.com/api/v1/orders/"
+  console.log("Parsed amount:", AMOUNT, "User ID:", USER_ID);
+
+//   "/api/v1/payments/process-token";
+
+  const payBtn = document.getElementById('payButton');
+  const statusDiv = document.getElementById('status');
+
+  function setStatus(msg, success=false){
+      statusDiv.innerText = msg;
+      statusDiv.style.color = success ? 'green' : 'red';
+  }
+
+  function toggleLoading(isLoading){
+      payBtn.disabled = isLoading;
+      payBtn.innerText = isLoading ? 'Processing…' : `Pay $${AMOUNT}`;
+  }
+
+  function sendPayment(){
+      toggleLoading(true);
+
+      const secureData = {
+          authData: {
+              clientKey: CLIENT_KEY,
+              apiLoginID: API_LOGIN_ID
+          },
+          cardData: {
+              cardNumber: document.getElementById('cardNumber').value.replace(/\s+/g, ''),
+              month: document.getElementById('expMonth').value,
+              year: document.getElementById('expYear').value,
+              cardCode: document.getElementById('cardCode').value,
+          }
+      };
+
+      Accept.dispatchData(secureData, responseHandler);
+  }
+
+  async function responseHandler(response){
+      if(response.messages.resultCode === 'Error'){
+          const msg = response.messages.message[0].text;
+          setStatus(`Tokenization Error: ${msg}`);
+          toggleLoading(false);
+          return;
+      }
+
+      const tokenData = response.opaqueData;
+      console.log(tokenData);
+      try{
+          const res = await fetch(PAYMENT_ENDPOINT, {
+              method: 'POST',
+              headers: {'Content-Type':'application/json'},
+              body: JSON.stringify({
+                  amount: AMOUNT,
+                  dataDescriptor: tokenData.dataDescriptor,
+                  dataValue: tokenData.dataValue,
+                  first_name: document.getElementById('firstName').value,
+                  last_name: document.getElementById('lastName').value
+              })
+          });
+          const data = await res.json();
+          if(res.ok && data.success){
+              setStatus('Payment Successful!', true);
+              // Notify mobile app via custom scheme
+              window.location.href = `farmfresh://payment/success?txId=${data.transaction_id}`;
+          }else{
+              const failMsg = data.message || 'Payment failed';
+              setStatus(failMsg);
+              window.location.href = `farmfresh://payment/fail?msg=${encodeURIComponent(failMsg)}`;
+          }
+      }catch(err){
+          setStatus('Network error processing payment');
+      }finally{
+          toggleLoading(false);
+      }
+  }
+</script>
+</body>
+</html>

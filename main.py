@@ -23,7 +23,6 @@ app = FastAPI(
     redirect_slashes=True
 )
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # In production, replace with specific origins
@@ -32,14 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# # Initialize database on startup
-# @app.on_event("startup")
-# def startup_db_client():
-#     logger.info("Initializing database")
-#     init_db()
-#     logger.info("Database initialized")
 
-# Include routers
 app.include_router(auth.router, prefix="/api/v1", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/v1", tags=["Users"])
 app.include_router(products.router, prefix="/api/v1", tags=["Products"])
@@ -52,5 +44,3 @@ app.include_router(files.router, prefix="/api/v1", tags=["Files"])
 async def root():
     return {"message": "Welcome to Farm Fresh Shop API"}
 
-# Handler for AWS Lambda
-# handler = Mangum(app)
