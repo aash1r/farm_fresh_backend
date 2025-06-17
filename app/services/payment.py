@@ -187,7 +187,7 @@ class PaymentService:
 
         # Customer information
         customer = apicontractsv1.customerDataType()
-        customer.id = uuid.uuid4().hex[:20]
+        # customer.id = uuid.uuid4().hex[:20]
         customer.email = f"{first_name.lower()}.{last_name.lower()}@example.com"
 
         # Billing name (optional but good practice)
