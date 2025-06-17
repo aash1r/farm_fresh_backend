@@ -187,7 +187,7 @@ class PaymentService:
 
         # Customer information
         customer = apicontractsv1.customerDataType()
-        customer.id = str(uuid.uuid4())
+        customer.id = str(uuid.uuid4())[:20]
         customer.email = f"{first_name.lower()}.{last_name.lower()}@example.com"
 
         # Billing name (optional but good practice)
@@ -207,7 +207,7 @@ class PaymentService:
         if invoice_number:
             if not transaction_request.order:
                 transaction_request.order = apicontractsv1.orderType()
-            transaction_request.order.invoiceNumber = invoice_number
+            transaction_request.order.invoiceNumber = invoice_number[:20]
 
         request = apicontractsv1.createTransactionRequest()
         request.merchantAuthentication = merchant_auth
