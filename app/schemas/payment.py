@@ -55,8 +55,8 @@ class PaymentResponse(BaseModel):
 class PaymentTokenRequest(BaseModel):
     """Schema for tokenized payment request"""
     amount: float = Field(..., gt=0, description="Payment amount")
-    dataDescriptor: str = Field(..., description="Opaque data descriptor from Accept.js")
-    dataValue: str = Field(..., description="Opaque data value from Accept.js")
+    data_descriptor: str = Field(..., description="Opaque data descriptor from Accept.js")
+    data_value: str = Field(..., description="Opaque data value from Accept.js")
     first_name: str = Field(..., description="Customer first name")
     last_name: str = Field(..., description="Customer last name")
     order_description: Optional[str] = Field("Farm Fresh Shop Order", description="Order description")

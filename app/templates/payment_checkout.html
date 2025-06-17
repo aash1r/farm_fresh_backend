@@ -125,6 +125,7 @@
               })
           });
           const data = await res.json();
+          console.log(data);
           if(res.ok && data.success){
               setStatus('Payment Successful!', true);
               // Notify mobile app via custom scheme

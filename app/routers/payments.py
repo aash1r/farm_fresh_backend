@@ -43,8 +43,8 @@ async def process_payment_token(
     try:
         success, message, transaction_id = payment_service.process_payment_token(
             amount=payment_in.amount,
-            data_descriptor=payment_in.dataDescriptor,
-            data_value=payment_in.dataValue,
+            data_descriptor=payment_in.data_descriptor,
+            data_value=payment_in.data_value,
             first_name=payment_in.first_name,
             last_name=payment_in.last_name,
             order_description=payment_in.order_description,
