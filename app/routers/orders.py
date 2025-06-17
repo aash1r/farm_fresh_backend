@@ -120,8 +120,8 @@ def create_order(
             data_value=request.data_value,
             first_name=request.first_name,
             last_name=request.last_name,
-            order_description=request.order_description,
-            invoice_number=request.invoice_number,
+            # order_description=request.order_description,
+            # invoice_number=request.invoice_number,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Payment processing error: {str(e)}")
