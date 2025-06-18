@@ -10,11 +10,20 @@ from app.core.payment_config import authorize_net_settings
 
 # Set up logging
 logger = logging.getLogger("payment_service")
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+
+# Attach handlers from Gunicorn if running under Gunicorn
+gunicorn_logger = logging.getLogger("gunicorn.error")
+if gunicorn_logger.handlers:
+    logger.handlers = gunicorn_logger.handlers
+    logger.setLevel(gunicorn_logger.level)
+else:
+    # Fallback to console handler
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+
 
 
 class PaymentService:
