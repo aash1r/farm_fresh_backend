@@ -120,15 +120,23 @@ class PaymentService:
 
         if response and response.messages.resultCode == "Ok":
             trans_id = getattr(response.transactionResponse, "transId", None)
+            logger.info(f"Transaction successful. ID: {trans_id}")
             return True, "Payment processed successfully", str(trans_id)
-        else:
-            message = "Payment failed"
+        
+        message = "Payment failed"
+        if response:
             try:
-                message = response.transactionResponse.errors.error[0].errorText  # type: ignore
-            except Exception:
-                pass
-            return False, message, None
+                if hasattr(response, "transactionResponse") and hasattr(response.transactionResponse, "errors"):
+                    error_text = response.transactionResponse.errors.error[0].errorText
+                    error_code = response.transactionResponse.errors.error[0].errorCode
+                    message = f"{error_code}: {error_text}"
+                elif hasattr(response, "messages") and hasattr(response.messages, "message"):
+                    message = response.messages.message[0].text
+            except Exception as e:
+                logger.exception("Error parsing payment failure response")
 
+        logger.error(f"Transaction failed: {message}")
+        return False, message, None
 
 # Create a singleton instance
 payment_service = PaymentService()
