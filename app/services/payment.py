@@ -124,7 +124,15 @@ class PaymentService:
         controller.execute()
 
         response = controller.getresponse()
-        logger.info(f"Authorize.Net response: {response}")
+        logger.info("resultCode: %s", response.messages.resultCode)
+        if hasattr(response, "transactionResponse"):
+            tr = response.transactionResponse
+            logger.info("responseCode: %s", getattr(tr, "responseCode", None))
+            logger.info("authCode: %s", getattr(tr, "authCode", None))
+            logger.info("messages: %s", getattr(tr, "messages", None))
+            logger.info("errors: %s", getattr(tr, "errors", None))
+            logger.info("raw transactionResponse: %s", tr)
+            logger.info(f"Authorize.Net response: {response}")
 
         if response and response.messages.resultCode == "Ok":
             trans_id = getattr(response.transactionResponse, "transId", None)
