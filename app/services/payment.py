@@ -33,7 +33,6 @@ class PaymentService:
     def get_merchant_auth(self) -> apicontractsv1.merchantAuthenticationType:
         """Get merchant authentication for Authorize.Net API"""
         merchant_auth = apicontractsv1.merchantAuthenticationType()
-        logger.info("merchant_auth:", merchant_auth)
         merchant_auth.name = self.api_login_id
         merchant_auth.transactionKey = self.transaction_key
         return merchant_auth
@@ -82,7 +81,7 @@ class PaymentService:
 
         # Customer information
         customer = apicontractsv1.customerDataType()
-        logger.info("customer:", customer)
+        logger.info(f"customer: {customer}")
         # customer.id = uuid.uuid4().hex[:20]
         customer.email = f"{first_name.lower()}.{last_name.lower()}@example.com"
 
@@ -138,5 +137,4 @@ class PaymentService:
         logger.error(f"Transaction failed: {message}")
         return False, message, None
 
-# Create a singleton instance
 payment_service = PaymentService()
