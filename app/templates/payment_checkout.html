@@ -37,6 +37,35 @@
               <input type="text" id="deliveryTypeDisplay" readonly>
           </div>
 
+          <div class="field">
+              <label for="country">Country / Region</label>
+              <input type="text" id="country" value="United States" required readonly>
+          </div>
+          <div class="field">
+              <label for="shipping_address">Street Address</label>
+              <input type="text" id="shipping_address" required>
+          </div>
+          <div class="field">
+              <label for="shipping_city">Town / City</label>
+              <input type="text" id="shipping_city" required>
+          </div>
+          <div class="field">
+              <label for="shipping_state">State / County</label>
+              <input type="text" id="shipping_state" required>
+          </div>
+          <div class="field">
+              <label for="whatsapp_number">WhatsApp Number</label>
+              <input type="text" id="whatsapp_number">
+          </div>
+          <div class="field">
+              <label for="email_address">Email Address</label>
+              <input type="email" id="email_address">
+          </div>
+          <div class="field">
+              <label for="order_notes">Order Notes</label>
+              <textarea id="order_notes" rows="2"></textarea>
+          </div>
+
           <div id="pickupFields" style="display:none">
               <div class="field">
                   <label>Airport</label>
@@ -80,7 +109,7 @@
               <input type="text" id="cardCode" maxlength="4" required>
           </div>
           <button id="payButton" type="submit">Pay</button>
-      </form>
+      </form> 
       <div id="status"></div>
   </div>
 
@@ -106,6 +135,15 @@
 
   // Prefill form fields once DOM is ready
   window.addEventListener('DOMContentLoaded', () => {
+      // Prefill new fields from CONTEXT
+      if (CONTEXT.country) document.getElementById('country').value = CONTEXT.country;
+      if (CONTEXT.shipping_address) document.getElementById('shipping_address').value = CONTEXT.shipping_address;
+      if (CONTEXT.shipping_city) document.getElementById('shipping_city').value = CONTEXT.shipping_city;
+      if (CONTEXT.shipping_state) document.getElementById('shipping_state').value = CONTEXT.shipping_state;
+      if (CONTEXT.whatsapp_number) document.getElementById('whatsapp_number').value = CONTEXT.whatsapp_number;
+      if (CONTEXT.email_address) document.getElementById('email_address').value = CONTEXT.email_address;
+      if (CONTEXT.order_notes) document.getElementById('order_notes').value = CONTEXT.order_notes;
+
       const dtDisplay = document.getElementById('deliveryTypeDisplay');
       if (dtDisplay) dtDisplay.value = DELIVERY_TYPE;
 
@@ -187,9 +225,14 @@
                   last_name: document.getElementById('lastName').value,
                   items: ITEMS,
                   delivery_type: DELIVERY_TYPE,
-                  shipping_zip: CONTEXT.shipping_zip,
-                  shipping_address: CONTEXT.shipping_address,
-                  shipping_state: CONTEXT.shipping_state,
+                  shipping_zip: document.getElementById('zipDisplay') ? document.getElementById('zipDisplay').value : CONTEXT.shipping_zip,
+                  shipping_address: document.getElementById('shipping_address') ? document.getElementById('shipping_address').value : CONTEXT.shipping_address,
+                  shipping_city: document.getElementById('shipping_city') ? document.getElementById('shipping_city').value : CONTEXT.shipping_city,
+                  shipping_state: document.getElementById('shipping_state') ? document.getElementById('shipping_state').value : CONTEXT.shipping_state,
+                  country: document.getElementById('country') ? document.getElementById('country').value : CONTEXT.country,
+                  whatsapp_number: document.getElementById('whatsapp_number') ? document.getElementById('whatsapp_number').value : CONTEXT.whatsapp_number,
+                  email_address: document.getElementById('email_address') ? document.getElementById('email_address').value : CONTEXT.email_address,
+                  order_notes: document.getElementById('order_notes') ? document.getElementById('order_notes').value : CONTEXT.order_notes,
                   phone: document.getElementById('phone') ? document.getElementById('phone').value : CONTEXT.phone,
                   airport_code: CONTEXT.airport_code,
                   airport_name: CONTEXT.airport_name,

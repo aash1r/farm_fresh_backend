@@ -57,7 +57,12 @@ class PayAndCreateOrderRequest(PaymentRequest, BaseModel):
     is_mango_delivery: bool = False
     payment_id: Optional[str] = None  # Will be populated from transaction_id
     shipping_address: str
+    shipping_city: str
     shipping_state: str
+    country: str = "United States"
+    whatsapp_number: Optional[str] = None
+    email_address: Optional[str] = None
+    order_notes: Optional[str] = None
     airport_code: Optional[str] = None
     airport_name: Optional[str] = None
     phone: str 
@@ -67,25 +72,27 @@ class PayAndCreateOrderRequest(PaymentRequest, BaseModel):
 class OrderBase(BaseModel):
     delivery_type: DeliveryType
     shipping_zip: Optional[str] = None
+    shipping_address: Optional[str] = None
+    shipping_city: Optional[str] = None
+    shipping_state: Optional[str] = None
+    country: Optional[str] = None
+    whatsapp_number: Optional[str] = None
+    email_address: Optional[str] = None
+    order_notes: Optional[str] = None
     payment_id: Optional[str] = None
     is_mango_delivery: bool = False
-    
-    # Optional fields based on delivery type
-    shipping_address: Optional[str] = None
-    shipping_state: Optional[str] = None
     airport_code: Optional[str] = None
     airport_name: Optional[str] = None
-    
     # Mango-specific fields
     # mango_items: Optional[List[MangoOrderItem]] = None
-    
+
     @validator('shipping_state')
     def validate_doorstep_fields(cls, v, values):
         if values.get('delivery_type') == DeliveryType.DOORSTEP and v is None:
             field_name = 'shipping_state' if v is None else 'shipping_address'
             raise ValueError(f'{field_name} is required for doorstep delivery')
         return v
-    
+
     @validator('airport_name')
     def validate_pickup_fields(cls, v, values):
         if values.get('delivery_type') == DeliveryType.PICKUP and v is None:

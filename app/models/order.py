@@ -38,7 +38,14 @@ class Order(Base):
     
     # For doorstep delivery
     shipping_address = Column(String, nullable=True)
+    shipping_city = Column(String, nullable=True)
     shipping_state = Column(String, nullable=True)
+    country = Column(String, nullable=True)
+    
+    # Contact & misc
+    whatsapp_number = Column(String, nullable=True)
+    email_address = Column(String, nullable=True)
+    order_notes = Column(String, nullable=True)
     
     # For airport pickup
     airport_code = Column(String, nullable=True)
