@@ -134,33 +134,35 @@ def create_order(
     order_items_data = []
 
     try:
-        with db.begin():
-            if request.is_mango_delivery:
-                total_amount, mango_order_items = handle_mango_order_logic(db, request)
-                order_items_data = mango_order_items
-            else:
-                total_amount, order_items_data = handle_regular_order_logic(db, request)
+        # Calculate totals and generate order/item data
+        if request.is_mango_delivery:
+            total_amount, order_items_data = handle_mango_order_logic(db, request)
+        else:
+            total_amount, order_items_data = handle_regular_order_logic(db, request)
 
-            order = Order(
-                order_number=order_number,
-                total_amount=total_amount,
-                status=OrderStatus.PROCESSING,
-                delivery_type=request.delivery_type,
-                is_mango_delivery=request.is_mango_delivery,
-                shipping_zip=request.shipping_zip,
-                shipping_address=request.shipping_address,
-                shipping_state=request.shipping_state,
-                airport_code=request.airport_code,
-                airport_name=request.airport_name,
-                payment_id=transaction_id,
-                user_id=current_user.id,
-            )
-            db.add(order)
-            db.flush()
+        # Create the order
+        order = Order(
+            order_number=order_number,
+            total_amount=total_amount,
+            status=OrderStatus.PROCESSING,
+            delivery_type=request.delivery_type,
+            is_mango_delivery=request.is_mango_delivery,
+            shipping_zip=request.shipping_zip,
+            shipping_address=request.shipping_address,
+            shipping_state=request.shipping_state,
+            airport_code=request.airport_code,
+            airport_name=request.airport_name,
+            payment_id=transaction_id,
+            user_id=current_user.id,
+        )
+        db.add(order)
+        db.flush()  # so we have order.id for items
 
-            for item_data in order_items_data:
-                db.add(OrderItem(order_id=order.id, **item_data))
+        # Add order items
+        for item_data in order_items_data:
+            db.add(OrderItem(order_id=order.id, **item_data))
 
+        db.commit()
         db.refresh(order)
         return PayAndCreateOrderResponse(
             success=True,
@@ -170,7 +172,7 @@ def create_order(
         )
 
     except Exception as e:
-        print("Failed to create order after successful payment")
+        print("Failed to create order after successful payment",e)
         raise HTTPException(status_code=500, detail="Order creation failed")
 
 
