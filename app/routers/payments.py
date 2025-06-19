@@ -23,6 +23,7 @@ router = APIRouter(prefix="/payments")
 async def payment_checkout(
     amount: float,
     request: Request,
+    context: str | None = None,
     current_user: User = Depends(get_current_user),
 ):
     auth_header = request.headers.get("Authorization")
@@ -30,7 +31,14 @@ async def payment_checkout(
         raise HTTPException(status_code=401, detail="Invalid or missing Authorization header")
     
     token = auth_header.split(" ")[1]
-    url = f"https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html?amount={amount}&auth_token={token}"
+    # Build checkout URL and forward optional context payload
+    url = (
+        "https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html"
+        f"?amount={amount}&auth_token={token}"
+    )
+    if context:
+        url += f"&context={context}"
+
     return {"checkout_url": url}
 
 @router.post("/process-token", response_model=PaymentResponse)

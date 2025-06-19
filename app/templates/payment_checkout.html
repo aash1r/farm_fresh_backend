@@ -30,6 +30,39 @@
               <label for="lastName">Last Name</label>
               <input type="text" id="lastName" required>
           </div>
+
+          <!-- Prefilled delivery info -->
+          <div class="field">
+              <label>Delivery Type</label>
+              <input type="text" id="deliveryTypeDisplay" readonly>
+          </div>
+
+          <div id="pickupFields" style="display:none">
+              <div class="field">
+                  <label>Airport</label>
+                  <input type="text" id="airportDisplay" readonly>
+              </div>
+          </div>
+
+          <div id="doorstepFields" style="display:none">
+              <div class="field">
+                  <label>Address</label>
+                  <input type="text" id="addressDisplay" readonly>
+              </div>
+              <div class="field">
+                  <label>State</label>
+                  <input type="text" id="stateDisplay" readonly>
+              </div>
+              <div class="field">
+                  <label>Zip</label>
+                  <input type="text" id="zipDisplay" readonly>
+              </div>
+          </div>
+
+          <div class="field">
+              <label for="phone">Phone</label>
+              <input type="text" id="phone" required>
+          </div>
           <div class="field">
               <label for="cardNumber">Card Number</label>
               <input type="text" id="cardNumber" autocomplete="cc-number" required>
@@ -56,8 +89,44 @@
   const API_LOGIN_ID = "4td4BU4F";
   // Amount injected by backend as string to avoid lint errors, then parsed
   const urlParams = new URLSearchParams(window.location.search);
-  const AMOUNT = parseFloat(urlParams.get('amount'))||0;
+  const AMOUNT = parseFloat(urlParams.get('amount')) || 0;
   const AUTH_TOKEN = urlParams.get("auth_token");
+  // Optional encoded JSON context passed from the mobile/web app
+  const RAW_CONTEXT = urlParams.get("context");
+  let CONTEXT = {};
+  try {
+      if (RAW_CONTEXT) {
+          CONTEXT = JSON.parse(decodeURIComponent(RAW_CONTEXT));
+      }
+  } catch (err) {
+      console.warn("Unable to parse context param", err);
+  }
+  const ITEMS = CONTEXT.items || [];
+  const DELIVERY_TYPE = CONTEXT.delivery_type || "pickup";  // default
+
+  // Prefill form fields once DOM is ready
+  window.addEventListener('DOMContentLoaded', () => {
+      const dtDisplay = document.getElementById('deliveryTypeDisplay');
+      if (dtDisplay) dtDisplay.value = DELIVERY_TYPE;
+
+      if (DELIVERY_TYPE === 'pickup') {
+          document.getElementById('pickupFields').style.display = 'block';
+          document.getElementById('doorstepFields').style.display = 'none';
+          document.getElementById('airportDisplay').value = `${CONTEXT.airport_name || ''} (${CONTEXT.airport_code || ''})`;
+      } else {
+          document.getElementById('pickupFields').style.display = 'none';
+          document.getElementById('doorstepFields').style.display = 'block';
+          document.getElementById('addressDisplay').value = CONTEXT.shipping_address || '';
+          document.getElementById('stateDisplay').value = CONTEXT.shipping_state || '';
+          document.getElementById('zipDisplay').value = CONTEXT.shipping_zip || '';
+      }
+
+      if (CONTEXT.phone) {
+          const phoneInput = document.getElementById('phone');
+          if (phoneInput) phoneInput.value = CONTEXT.phone;
+      }
+  });
+  
   const PAYMENT_ENDPOINT = "https://api.farmfreshshop.com/api/v1/orders/"
   console.log("Parsed amount:", AMOUNT, "User ID:", AUTH_TOKEN);
 
@@ -116,12 +185,14 @@
                   data_value: tokenData.dataValue,
                   first_name: document.getElementById('firstName').value,
                   last_name: document.getElementById('lastName').value,
-                  items: [],  // you may need to inject cart items here from the app context
-                  delivery_type: "pickup", // example placeholder
-                  shipping_zip: "12345",
-                  shipping_address: "123 Mango Street",
-                  shipping_state: "CA",
-                  phone: "1234567890"
+                  items: ITEMS,
+                  delivery_type: DELIVERY_TYPE,
+                  shipping_zip: CONTEXT.shipping_zip,
+                  shipping_address: CONTEXT.shipping_address,
+                  shipping_state: CONTEXT.shipping_state,
+                  phone: document.getElementById('phone') ? document.getElementById('phone').value : CONTEXT.phone,
+                  airport_code: CONTEXT.airport_code,
+                  airport_name: CONTEXT.airport_name,
               })
           });
           const data = await res.json();
