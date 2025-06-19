@@ -7,41 +7,92 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.responses import RedirectResponse
 from app.core.deps import get_db, get_current_user
+from app.schemas.order import CheckoutRequest
 from app.models.user import User
 from app.schemas.payment import (
     PaymentResponse,
     ClientToken,
     PaymentTokenRequest,
 )
+from app.services.delivery import delivery_service
 from app.services.payment import payment_service
+from app.utils.helper_functions import handle_regular_order_logic
 
 templates = Jinja2Templates(directory="app/templates")
 router = APIRouter(prefix="/payments")
 
 
-@router.get("/checkout")
-async def payment_checkout(
-    amount: float,
-    airport_name: str,
+# @router.get("/checkout")
+# async def payment_checkout(
+#     amount: float,
+#     airport_name: str,
+#     request: Request,
+#     context: str | None = None,
+#     current_user: User = Depends(get_current_user),
+# ):
+#     auth_header = request.headers.get("Authorization")
+#     if not auth_header or not auth_header.startswith("Bearer "):
+#         raise HTTPException(status_code=401, detail="Invalid or missing Authorization header")
     
+#     token = auth_header.split(" ")[1]
+#     # Build checkout URL and forward optional context payload
+#     url = (
+#         "https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html"
+#         f"?amount={amount}&airport_name={airport_name}&auth_token={token}"
+#     )
+#     if context:
+#         url += f"&context={context}"
+
+#     return {"checkout_url": url}
+
+@router.post("/checkout")
+def generate_checkout_url(
+    payload: CheckoutRequest,
     request: Request,
-    context: str | None = None,
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """Generate checkout URL with validated context for Accept Hosted form"""
+
+    # STEP 1: Validate products and get real items
+    total, items = handle_regular_order_logic(db, payload)
+
+    # STEP 2: If mango delivery, validate rules (you already have this logic)
+    # if payload.is_mango_delivery:
+    #     # validate mango delivery rules...
+    #     is_valid, error, calculated_price = delivery_service.validate_mango_order(
+    #         payload.delivery_type.value,
+    #         [item.mango_type for item in payload.mango_items],
+    #         [item.quantity for item in payload.mango_items],
+    #     )
+    #     if not is_valid:
+    #         raise HTTPException(status_code=400, detail=error)
+    #     total = calculated_price
+
+    context_dict = {
+        "items": items,
+        "amount": total,
+        "airport_name": payload.airport_name,
+    }
+    print("Context dict:", context_dict)
+
+    # STEP 4: Encode context
+    from urllib.parse import quote
+    import json
+    context_encoded = quote(json.dumps(context_dict))
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid or missing Authorization header")
     
     token = auth_header.split(" ")[1]
-    # Build checkout URL and forward optional context payload
-    url = (
+    # STEP 5: Create checkout URL
+    checkout_url = (
         "https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html"
-        f"?amount={amount}&airport_name={airport_name}&auth_token={token}"
+        f"?amount={total}&airport_name={payload.airport_name}&auth_token={token}&context={context_encoded}"
     )
-    if context:
-        url += f"&context={context}"
 
-    return {"checkout_url": url}
+    return {"checkout_url": checkout_url}
+
 
 @router.post("/process-token", response_model=PaymentResponse)
 async def process_payment_token(
@@ -63,6 +114,9 @@ async def process_payment_token(
         return PaymentResponse(success=success, message=message, transaction_id=transaction_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Payment processing error: {str(e)}")
+
+
+
 
 @router.get("/client-token", response_model=ClientToken)
 async def get_client_token(

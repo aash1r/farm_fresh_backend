@@ -15,6 +15,12 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    otp = Column(String, nullable=True)
+    otp_expires_at = Column(DateTime, nullable=True)
+    is_verified = Column(Boolean, default=False)
+    is_archived = Column(Boolean, default=False)
+
+
     
     # Relationships
     orders = relationship("Order", back_populates="user")

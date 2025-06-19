@@ -11,7 +11,8 @@ class OrderItemBase(BaseModel):
     unit_price: Optional[float] = None
     total_price: float
     mango_type: Optional[str] = None  # For mango orders
-
+    type: Optional[str] = None
+    
 class OrderItemCreate(OrderItemBase):
     pass
 
@@ -49,6 +50,11 @@ class MangoOrderItem(BaseModel):
             )
         return v
 
+
+class CheckoutRequest(BaseModel):
+    items: List[OrderItemCreate]
+    airport_name: Optional[str] = None
+    amount: float
 
 class PayAndCreateOrderRequest(PaymentRequest, BaseModel):
     items: List[OrderItemCreate]

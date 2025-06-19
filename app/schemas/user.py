@@ -25,6 +25,11 @@ class UserInDBBase(UserBase):
     id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
+    otp: Optional[str] = None
+    otp_expires_at: Optional[datetime] = None
+    is_verified: bool
+    is_archived: bool
+
 
     class Config:
         from_attributes = True
@@ -36,3 +41,4 @@ class User(UserInDBBase):
 # Properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: str
+    

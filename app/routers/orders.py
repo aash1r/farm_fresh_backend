@@ -14,10 +14,11 @@ from app.schemas.order import Order as OrderSchema, OrderCreate, OrderUpdate, Ma
 from app.services.delivery import delivery_service
 from app.services.payment import payment_service
 from app.utils.helper_functions import handle_regular_order_logic, handle_mango_order_logic
+from app.core.email_utils import send_order_email
 
 router = APIRouter(prefix="/orders",redirect_slashes=False)
 
-@router.get("/", response_model=List[OrderSchema])
+@router.get("/", response_model=List[OrderSchema])  
 def read_orders(
     db: Session = Depends(get_db),
     skip: int = 0,
@@ -164,6 +165,26 @@ def create_order(
 
         db.commit()
         db.refresh(order)
+        
+        try:
+            send_order_email(
+                recipient_email=current_user.email,
+                order_number=order_number,
+                total_amount=total_amount,
+                first_name=request.first_name,
+                last_name=request.last_name,
+                email_address=current_user.email,
+                phone=request.phone,
+                delivery_type=request.delivery_type,
+                shipping_address=request.shipping_address,
+                shipping_state=request.shipping_state,
+                shipping_zip=request.shipping_zip,
+                airport_name=request.airport_name,
+                items=order_items_data
+            )
+        except Exception as e:
+            print("Email sending failed:", e)
+
         return PayAndCreateOrderResponse(
             success=True,
             message=message,

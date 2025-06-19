@@ -323,13 +323,6 @@
                       <input type="text" id="shipping_state" required>
                   </div>
               </div>
-              
-              <div id="pickupFields" style="display:none">
-                  <div class="field">
-                      <label>Selected Airport</label>
-                      <input type="text" id="airportDisplay" readonly>
-                  </div>
-              </div>
 
               <div id="doorstepFields" style="display:none">
                   <div class="field">
@@ -401,6 +394,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const AMOUNT = parseFloat(urlParams.get('amount')) || 0;
   const AUTH_TOKEN = urlParams.get("auth_token");
+  const AIRPORT_NAME = urlParams.get("airport_name");
   // Optional encoded JSON context passed from the mobile/web app
   const RAW_CONTEXT = urlParams.get("context");
   let CONTEXT = {};
@@ -437,9 +431,8 @@
           document.getElementById('pickupInfo').style.display = 'block';
           document.getElementById('doorstepInfo').style.display = 'none';
           
-          const airportText = `${CONTEXT.airport_name || 'ATLANTA,GA'} ${CONTEXT.airport_code || ''}`;
-          document.getElementById('airportDisplay').value = airportText;
-          document.getElementById('pickupInfo').innerHTML = `<p>📍 ${airportText}</p>`;
+          document.getElementById('airportDisplay').textContent = AIRPORT_NAME;
+          document.getElementById('pickupInfo').innerHTML = `<p>📍 ${AIRPORT_NAME}</p>`;
       } else {
           document.getElementById('pickupFields').style.display = 'none';
           document.getElementById('doorstepFields').style.display = 'block';
@@ -532,7 +525,7 @@
                   order_notes: document.getElementById('order_notes') ? document.getElementById('order_notes').value : CONTEXT.order_notes,
                   phone: document.getElementById('phone') ? document.getElementById('phone').value : CONTEXT.phone,
                   airport_code: CONTEXT.airport_code,
-                  airport_name: CONTEXT.airport_name,
+                  airport_name: AIRPORT_NAME,
               })
           });
           const data = await res.json();
@@ -541,15 +534,12 @@
               setStatus('Payment completed successfully! 🎉', true);
               // Notify mobile app via custom scheme
               setTimeout(() => {
-                  window.location.href = `farmfresh://payment/success?txId=${data.transaction_id}`;
+                  window.location.href = `https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_sucess.html`;
               }, 2000);
           }else{
               const failMsg = data.message || 'Payment failed';
               setStatus(failMsg);
               console.error("Payment Failed:", failMsg);
-              setTimeout(() => {
-                  window.location.href = `farmfresh://payment/fail?msg=${encodeURIComponent(failMsg)}`;
-              }, 3000);
           }
       }catch(err){
           setStatus('Network error processing payment');
