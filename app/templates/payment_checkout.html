@@ -6,110 +6,391 @@
   <title>Farm Fresh Shop – Payment</title>
   <script type="text/javascript" src="https://jstest.authorize.net/v1/Accept.js" charset="utf-8"></script>
   <style>
-      body{font-family: Arial, Helvetica, sans-serif;margin:0;padding:0;background:#fafafa;color:#333}
-      .container{max-width:480px;margin:0 auto;padding:24px}
-      h2{text-align:center;margin-bottom:16px}
-      .field{margin-bottom:12px;display:flex;flex-direction:column}
-      .field label{font-size:14px;margin-bottom:4px}
-      .field input{padding:10px;font-size:16px;border:1px solid #ccc;border-radius:4px}
-      button{width:100%;padding:14px;margin-top:12px;background:#28a745;border:none;color:#fff;font-size:16px;border-radius:4px;cursor:pointer}
-      button:disabled{opacity:.6;cursor:not-allowed}
-      #status{margin-top:16px;text-align:center}
+      * {
+          box-sizing: border-box;
+      }
+      
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          margin: 0;
+          padding: 0;
+          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          color: #333;
+          min-height: 100vh;
+      }
+      
+      .container {
+          max-width: 480px;
+          margin: 0 auto;
+          padding: 20px;
+      }
+      
+      .header {
+          text-align: center;
+          margin-bottom: 30px;
+          background: white;
+          padding: 25px;
+          border-radius: 20px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      }
+      
+      .header h1 {
+          margin: 0 0 10px 0;
+          font-size: 24px;
+          font-weight: 600;
+          color: #2d3748;
+      }
+      
+      .header .amount {
+          font-size: 32px;
+          font-weight: bold;
+          color: #8BC34A;
+          margin: 10px 0;
+      }
+      
+      .section {
+          background: white;
+          margin-bottom: 20px;
+          border-radius: 20px;
+          padding: 25px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      }
+      
+      .section-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #2d3748;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+      
+      .section-title::before {
+          content: '';
+          width: 4px;
+          height: 20px;
+          background: #8BC34A;
+          border-radius: 2px;
+      }
+      
+      .form-row {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 15px;
+      }
+      
+      .form-row .field {
+          flex: 1;
+      }
+      
+      .field {
+          margin-bottom: 20px;
+      }
+      
+      .field label {
+          display: block;
+          font-size: 14px;
+          font-weight: 500;
+          color: #4a5568;
+          margin-bottom: 8px;
+      }
+      
+      .field input,
+      .field textarea {
+          width: 100%;
+          padding: 15px;
+          font-size: 16px;
+          border: 2px solid #e2e8f0;
+          border-radius: 12px;
+          background: #f8fafc;
+          transition: all 0.3s ease;
+          font-family: inherit;
+      }
+      
+      .field input:focus,
+      .field textarea:focus {
+          outline: none;
+          border-color: #8BC34A;
+          background: white;
+          box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.1);
+      }
+      
+      .field input:read-only {
+          background: #f1f5f9;
+          color: #64748b;
+      }
+      
+      .field textarea {
+          resize: vertical;
+          min-height: 60px;
+      }
+      
+      .delivery-info {
+          background: linear-gradient(135deg, #8BC34A 0%, #689F38 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 15px;
+          margin-bottom: 20px;
+      }
+      
+      .delivery-info h3 {
+          margin: 0 0 10px 0;
+          font-size: 16px;
+          font-weight: 600;
+      }
+      
+      .delivery-info p {
+          margin: 5px 0;
+          opacity: 0.9;
+          font-size: 14px;
+      }
+      
+      .pay-button {
+          width: 100%;
+          padding: 18px;
+          background: linear-gradient(135deg, #8BC34A 0%, #689F38 100%);
+          border: none;
+          color: white;
+          font-size: 18px;
+          font-weight: 600;
+          border-radius: 15px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(139, 195, 74, 0.4);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+      }
+      
+      .pay-button:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(139, 195, 74, 0.6);
+      }
+      
+      .pay-button:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+      }
+      
+      #status {
+          margin-top: 20px;
+          padding: 15px;
+          text-align: center;
+          border-radius: 10px;
+          font-weight: 500;
+          display: none;
+      }
+      
+      #status.show {
+          display: block;
+      }
+      
+      #status.success {
+          background: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+      }
+      
+      #status.error {
+          background: #f8d7da;
+          color: #721c24;
+          border: 1px solid #f5c6cb;
+      }
+      
+      .card-icons {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+      }
+      
+      .card-icon {
+          width: 40px;
+          height: 25px;
+          background: #f1f5f9;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          font-weight: bold;
+          color: #64748b;
+      }
+      
+      .security-note {
+          background: #f0f9ff;
+          border: 1px solid #bae6fd;
+          border-radius: 10px;
+          padding: 15px;
+          margin-top: 15px;
+          font-size: 14px;
+          color: #0369a1;
+          text-align: center;
+      }
+      
+      .security-note::before {
+          content: '🔒';
+          margin-right: 8px;
+      }
+      
+      @media (max-width: 480px) {
+          .container {
+              padding: 15px;
+          }
+          
+          .form-row {
+              flex-direction: column;
+              gap: 0;
+          }
+          
+          .section {
+              padding: 20px;
+          }
+      }
   </style>
 </head>
 <body>
   <div class="container">
-      <h2>Complete Payment</h2>
-      <!-- <p style="text-align:center">Amount: <strong>${{ amount }}</strong></p> -->
+      <div class="header">
+          <h1>🥭 Complete Your Order</h1>
+          <div class="amount" id="amountDisplay">$0.00</div>
+          <p style="color: #64748b; margin: 0;">Secure payment powered by Authorize.Net</p>
+      </div>
+
       <form id="paymentForm" onsubmit="event.preventDefault();sendPayment();">
-          <div class="field">
-              <label for="firstName">First Name</label>
-              <input type="text" id="firstName" required>
-          </div>
-          <div class="field">
-              <label for="lastName">Last Name</label>
-              <input type="text" id="lastName" required>
-          </div>
-
-          <!-- Prefilled delivery info -->
-          <div class="field">
-              <label>Delivery Type</label>
-              <input type="text" id="deliveryTypeDisplay" readonly>
-          </div>
-
-          <div class="field">
-              <label for="country">Country / Region</label>
-              <input type="text" id="country" value="United States" required readonly>
-          </div>
-          <div class="field">
-              <label for="shipping_address">Street Address</label>
-              <input type="text" id="shipping_address" required>
-          </div>
-          <div class="field">
-              <label for="shipping_city">Town / City</label>
-              <input type="text" id="shipping_city" required>
-          </div>
-          <div class="field">
-              <label for="shipping_state">State / County</label>
-              <input type="text" id="shipping_state" required>
-          </div>
-          <div class="field">
-              <label for="whatsapp_number">WhatsApp Number</label>
-              <input type="text" id="whatsapp_number">
-          </div>
-          <div class="field">
-              <label for="email_address">Email Address</label>
-              <input type="email" id="email_address">
-          </div>
-          <div class="field">
-              <label for="order_notes">Order Notes</label>
-              <textarea id="order_notes" rows="2"></textarea>
-          </div>
-
-          <div id="pickupFields" style="display:none">
-              <div class="field">
-                  <label>Airport</label>
-                  <input type="text" id="airportDisplay" readonly>
+          
+          <!-- Delivery Information -->
+          <div class="section">
+              <div class="section-title">🚚 Delivery Information</div>
+              <div class="delivery-info" id="deliveryInfo">
+                  <h3 id="deliveryTypeDisplay">Delivery Type</h3>
+                  <div id="pickupInfo" style="display:none">
+                      <p id="airportDisplay">Airport information will appear here</p>
+                  </div>
+                  <div id="doorstepInfo" style="display:none">
+                      <p id="addressDisplay">Address information will appear here</p>
+                  </div>
               </div>
           </div>
 
-          <div id="doorstepFields" style="display:none">
-              <div class="field">
-                  <label>Address</label>
-                  <input type="text" id="addressDisplay" readonly>
+          <!-- Personal Information -->
+          <div class="section">
+              <div class="section-title">👤 Personal Information</div>
+              <div class="form-row">
+                  <div class="field">
+                      <label for="firstName">First Name</label>
+                      <input type="text" id="firstName" required>
+                  </div>
+                  <div class="field">
+                      <label for="lastName">Last Name</label>
+                      <input type="text" id="lastName" required>
+                  </div>
+              </div>
+              <div class="form-row">
+                  <div class="field">
+                      <label for="phone">Phone Number</label>
+                      <input type="text" id="phone" required>
+                  </div>
+                  <div class="field">
+                      <label for="whatsapp_number">WhatsApp Number</label>
+                      <input type="text" id="whatsapp_number">
+                  </div>
               </div>
               <div class="field">
-                  <label>State</label>
-                  <input type="text" id="stateDisplay" readonly>
-              </div>
-              <div class="field">
-                  <label>Zip</label>
-                  <input type="text" id="zipDisplay" readonly>
+                  <label for="email_address">Email Address</label>
+                  <input type="email" id="email_address">
               </div>
           </div>
 
-          <div class="field">
-              <label for="phone">Phone</label>
-              <input type="text" id="phone" required>
+          <!-- Shipping Address -->
+          <div class="section">
+              <div class="section-title">📍 Shipping Address</div>
+              <div class="field">
+                  <label for="country">Country / Region</label>
+                  <input type="text" id="country" value="United States" required readonly>
+              </div>
+              <div class="field">
+                  <label for="shipping_address">Street Address</label>
+                  <input type="text" id="shipping_address" required>
+              </div>
+              <div class="form-row">
+                  <div class="field">
+                      <label for="shipping_city">City</label>
+                      <input type="text" id="shipping_city" required>
+                  </div>
+                  <div class="field">
+                      <label for="shipping_state">State</label>
+                      <input type="text" id="shipping_state" required>
+                  </div>
+              </div>
+              
+              <div id="pickupFields" style="display:none">
+                  <div class="field">
+                      <label>Selected Airport</label>
+                      <input type="text" id="airportDisplay" readonly>
+                  </div>
+              </div>
+
+              <div id="doorstepFields" style="display:none">
+                  <div class="field">
+                      <label>Delivery Address</label>
+                      <input type="text" id="addressDisplay" readonly>
+                  </div>
+                  <div class="form-row">
+                      <div class="field">
+                          <label>State</label>
+                          <input type="text" id="stateDisplay" readonly>
+                      </div>
+                      <div class="field">
+                          <label>ZIP Code</label>
+                          <input type="text" id="zipDisplay" readonly>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="field">
+                  <label for="order_notes">Order Notes (Optional)</label>
+                  <textarea id="order_notes" placeholder="Any special instructions for your order..."></textarea>
+              </div>
           </div>
-          <div class="field">
-              <label for="cardNumber">Card Number</label>
-              <input type="text" id="cardNumber" autocomplete="cc-number" required>
+
+          <!-- Payment Information -->
+          <div class="section">
+              <div class="section-title">💳 Payment Information</div>
+              <div class="field">
+                  <label for="cardNumber">Card Number</label>
+                  <input type="text" id="cardNumber" autocomplete="cc-number" required placeholder="1234 5678 9012 3456">
+                  <div class="card-icons">
+                      <div class="card-icon">VISA</div>
+                      <div class="card-icon">MC</div>
+                      <div class="card-icon">AMEX</div>
+                      <div class="card-icon">DISC</div>
+                  </div>
+              </div>
+              <div class="form-row">
+                  <div class="field">
+                      <label for="expMonth">Expiry Month</label>
+                      <input type="text" id="expMonth" maxlength="2" required placeholder="MM">
+                  </div>
+                  <div class="field">
+                      <label for="expYear">Expiry Year</label>
+                      <input type="text" id="expYear" maxlength="4" required placeholder="YYYY">
+                  </div>
+                  <div class="field">
+                      <label for="cardCode">Security Code</label>
+                      <input type="text" id="cardCode" maxlength="4" required placeholder="123">
+                  </div>
+              </div>
+              <div class="security-note">
+                  Your payment information is encrypted and secure
+              </div>
           </div>
-          <div class="field">
-              <label for="expMonth">Expiry Month (MM)</label>
-              <input type="text" id="expMonth" maxlength="2" required>
-          </div>
-          <div class="field">
-              <label for="expYear">Expiry Year (YYYY)</label>
-              <input type="text" id="expYear" maxlength="4" required>
-          </div>
-          <div class="field">
-              <label for="cardCode">CVC</label>
-              <input type="text" id="cardCode" maxlength="4" required>
-          </div>
-          <button id="payButton" type="submit">Pay</button>
+
+          <button id="payButton" type="submit" class="pay-button">
+              Complete Payment
+          </button>
       </form> 
+      
       <div id="status"></div>
   </div>
 
@@ -135,6 +416,9 @@
 
   // Prefill form fields once DOM is ready
   window.addEventListener('DOMContentLoaded', () => {
+      // Update amount display
+      document.getElementById('amountDisplay').textContent = `$${AMOUNT.toFixed(2)}`;
+      
       // Prefill new fields from CONTEXT
       if (CONTEXT.country) document.getElementById('country').value = CONTEXT.country;
       if (CONTEXT.shipping_address) document.getElementById('shipping_address').value = CONTEXT.shipping_address;
@@ -145,18 +429,31 @@
       if (CONTEXT.order_notes) document.getElementById('order_notes').value = CONTEXT.order_notes;
 
       const dtDisplay = document.getElementById('deliveryTypeDisplay');
-      if (dtDisplay) dtDisplay.value = DELIVERY_TYPE;
+      if (dtDisplay) dtDisplay.textContent = DELIVERY_TYPE.charAt(0).toUpperCase() + DELIVERY_TYPE.slice(1);
 
       if (DELIVERY_TYPE === 'pickup') {
           document.getElementById('pickupFields').style.display = 'block';
           document.getElementById('doorstepFields').style.display = 'none';
-          document.getElementById('airportDisplay').value = `${CONTEXT.airport_name || ''} (${CONTEXT.airport_code || ''})`;
+          document.getElementById('pickupInfo').style.display = 'block';
+          document.getElementById('doorstepInfo').style.display = 'none';
+          
+          const airportText = `${CONTEXT.airport_name || 'ATLANTA,GA'} ${CONTEXT.airport_code || ''}`;
+          document.getElementById('airportDisplay').value = airportText;
+          document.getElementById('pickupInfo').innerHTML = `<p>📍 ${airportText}</p>`;
       } else {
           document.getElementById('pickupFields').style.display = 'none';
           document.getElementById('doorstepFields').style.display = 'block';
+          document.getElementById('pickupInfo').style.display = 'none';
+          document.getElementById('doorstepInfo').style.display = 'block';
+          
           document.getElementById('addressDisplay').value = CONTEXT.shipping_address || '';
           document.getElementById('stateDisplay').value = CONTEXT.shipping_state || '';
           document.getElementById('zipDisplay').value = CONTEXT.shipping_zip || '';
+          
+          document.getElementById('doorstepInfo').innerHTML = `
+              <p>🏠 ${CONTEXT.shipping_address || 'Address not specified'}</p>
+              <p>📮 ${CONTEXT.shipping_city || ''}, ${CONTEXT.shipping_state || ''} ${CONTEXT.shipping_zip || ''}</p>
+          `;
       }
 
       if (CONTEXT.phone) {
@@ -168,19 +465,19 @@
   const PAYMENT_ENDPOINT = "https://api.farmfreshshop.com/api/v1/orders/"
   console.log("Parsed amount:", AMOUNT, "User ID:", AUTH_TOKEN);
 
-//   "/api/v1/payments/process-token";
-
   const payBtn = document.getElementById('payButton');
   const statusDiv = document.getElementById('status');
 
   function setStatus(msg, success=false){
-      statusDiv.innerText = msg;
-      statusDiv.style.color = success ? 'green' : 'red';
+      statusDiv.innerHTML = success ? '✅ ' + msg : '❌ ' + msg;
+      statusDiv.className = success ? 'show success' : 'show error';
   }
 
   function toggleLoading(isLoading){
       payBtn.disabled = isLoading;
-      payBtn.innerText = isLoading ? 'Processing…' : `Pay $${AMOUNT}`;
+      payBtn.innerHTML = isLoading ? 
+          '⏳ Processing Payment...' : 
+          `🔒 Pay $${AMOUNT.toFixed(2)}`;
   }
 
   function sendPayment(){
@@ -205,7 +502,7 @@
   async function responseHandler(response){
       if(response.messages.resultCode === 'Error'){
           const msg = response.messages.message[0].text;
-          setStatus(`Tokenization Error: ${msg}`);
+          setStatus(`Payment Error: ${msg}`);
           toggleLoading(false);
           return;
       }
@@ -241,17 +538,22 @@
           const data = await res.json();
           console.log(data);
           if(res.ok && data.success){
-              setStatus('Payment Successful!', true);
+              setStatus('Payment completed successfully! 🎉', true);
               // Notify mobile app via custom scheme
-              window.location.href = `farmfresh://payment/success?txId=${data.transaction_id}`;
+              setTimeout(() => {
+                  window.location.href = `farmfresh://payment/success?txId=${data.transaction_id}`;
+              }, 2000);
           }else{
               const failMsg = data.message || 'Payment failed';
               setStatus(failMsg);
               console.error("Payment Failed:", failMsg);
-              window.location.href = `farmfresh://payment/fail?msg=${encodeURIComponent(failMsg)}`;
+              setTimeout(() => {
+                  window.location.href = `farmfresh://payment/fail?msg=${encodeURIComponent(failMsg)}`;
+              }, 3000);
           }
       }catch(err){
           setStatus('Network error processing payment');
+          console.error("Network error:", err);
       }finally{
           toggleLoading(false);
       }

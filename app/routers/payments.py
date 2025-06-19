@@ -22,6 +22,8 @@ router = APIRouter(prefix="/payments")
 @router.get("/checkout")
 async def payment_checkout(
     amount: float,
+    airport_name: str,
+    
     request: Request,
     context: str | None = None,
     current_user: User = Depends(get_current_user),
@@ -34,7 +36,7 @@ async def payment_checkout(
     # Build checkout URL and forward optional context payload
     url = (
         "https://mypaymenthtml.s3.us-east-1.amazonaws.com/payment_checkout.html"
-        f"?amount={amount}&auth_token={token}"
+        f"?amount={amount}&airport_name={airport_name}&auth_token={token}"
     )
     if context:
         url += f"&context={context}"
