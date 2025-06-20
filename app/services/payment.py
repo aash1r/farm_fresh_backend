@@ -39,6 +39,12 @@ class PaymentService:
         print(self.client_key)
         print(self.sandbox_mode)
 
+        logger.info(f"Sandbox mode: {self.sandbox_mode}")
+        logger.info(f"API Login ID: {self.api_login_id[:4]}****")
+
+        if not all([self.api_login_id, self.transaction_key, self.client_key]):
+            raise ValueError("Missing required Authorize.Net credentials") 
+
     def get_merchant_auth(self) -> apicontractsv1.merchantAuthenticationType:
         """Get merchant authentication for Authorize.Net API"""
         merchant_auth = apicontractsv1.merchantAuthenticationType()
@@ -121,11 +127,21 @@ class PaymentService:
         controller = createTransactionController(request)
         if self.sandbox_mode:
             controller.setenvironment(constants.SANDBOX)
+            logger.info("Using SANDBOX environment")
         else:
             controller.setenvironment(constants.PRODUCTION)
+            logger.info("Using PRODUCTION environment")
 
+        logger.info("Executing transaction...")
         response = controller.getresponse()
+        
+        if response is None:
+            logger.error("Received None response from Authorize.Net API")
+            return False, "No response from payment gateway. Please check your network connection and API credentials.", None
+            
+
         logger.info("resultCode: %s", response.messages.resultCode)
+        
         if hasattr(response, "transactionResponse"):
             tr = response.transactionResponse
             logger.info("responseCode: %s", getattr(tr, "responseCode", None))
@@ -141,6 +157,7 @@ class PaymentService:
             return True, "Payment processed successfully", str(trans_id)
         
         message = "Payment failed"
+        
         if response:
             try:
                 if hasattr(response, "transactionResponse") and hasattr(response.transactionResponse, "errors"):
