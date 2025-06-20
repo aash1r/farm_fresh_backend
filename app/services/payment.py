@@ -172,9 +172,10 @@ class PaymentService:
         if self.sandbox_mode:
             controller.setenvironment(constants.SANDBOX)
             print("Using SANDBOX environment")
-        else:
-            controller.setenvironment(constants.PRODUCTION)
-            print("Using PRODUCTION environment")
+        controller.execute()
+        # else:
+        #     controller.setenvironment(constants.PRODUCTION)
+        #     print("Using PRODUCTION environment")
 
         print("Executing transaction...")
         response = controller.getresponse()
