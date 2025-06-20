@@ -43,7 +43,7 @@ class PaymentService:
         logger.info(f"API Login ID: {self.api_login_id[:4]}****")
 
         if not all([self.api_login_id, self.transaction_key, self.client_key]):
-            raise ValueError("Missing required Authorize.Net credentials") 
+            raise ValueError("Missing required Authorize.Net credentials")
 
     def get_merchant_auth(self) -> apicontractsv1.merchantAuthenticationType:
         """Get merchant authentication for Authorize.Net API"""
@@ -63,6 +63,48 @@ class PaymentService:
             "apiLoginID": self.api_login_id
         }
 
+    def test_api_credentials(self) -> Tuple[bool, str]:
+        """Test API credentials by making a simple API call"""
+        try:
+            print("Testing API credentials...")
+            
+            merchant_auth = self.get_merchant_auth()
+            
+            # Create a simple test request (get merchant details)
+            request = apicontractsv1.getMerchantDetailsRequest()
+            request.merchantAuthentication = merchant_auth
+            
+            from authorizenet.apicontrollers import getMerchantDetailsController
+            controller = getMerchantDetailsController(request)
+            
+            if self.sandbox_mode:
+                controller.setenvironment(constants.SANDBOX)
+                print("Testing with SANDBOX environment")
+            else:
+                controller.setenvironment(constants.PRODUCTION)
+                print("Testing with PRODUCTION environment")
+            
+            response = controller.getresponse()
+            
+            if response is None:
+                print("API credentials test: Received None response")
+                return False, "No response from Authorize.Net API - check network/credentials"
+            
+            print(f"API test response code: {response.messages.resultCode}")
+            
+            if response.messages.resultCode == "Ok":
+                print("API credentials test: SUCCESS")
+                return True, "API credentials are valid"
+            else:
+                error_msg = "Unknown error"
+                if hasattr(response.messages, 'message') and response.messages.message:
+                    error_msg = response.messages.message[0].text
+                print(f"API credentials test failed: {error_msg}")
+                return False, f"API credentials invalid: {error_msg}"
+                
+        except Exception as e:
+            print(f"API credentials test exception: {e}")
+            return False, f"API test failed: {str(e)}"
 
     def process_payment_token(
         self,

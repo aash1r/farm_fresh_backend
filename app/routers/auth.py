@@ -13,6 +13,8 @@ from app.schemas.token import Token, TokenWithUser
 from app.schemas.user import User as UserSchema, UserCreate
 from app.core.email_utils import send_otp_email
 from pydantic import BaseModel
+from app.services.payment import payment_service
+
 
 router = APIRouter(prefix="/auth")
 
@@ -166,3 +168,13 @@ def delete_account(current_user: User = Depends(get_current_user), db: Session =
 def test_token(current_user: User = Depends(get_current_user)) -> Any:
     """Test access token"""
     return current_user
+
+
+# Add this to your FastAPI app temporarily
+@app.get("/test-auth-net")
+async def test_authorize_net():
+    try:
+        success, message = payment_service.test_api_credentials()
+        return {"success": success, "message": message}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
