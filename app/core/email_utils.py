@@ -2,8 +2,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-EMAIL_ADDRESS = "aashirisani@gmail.com"
-APP_PASSWORD = "svxiyqmskgvkenil"
+EMAIL_ADDRESS = "rizwanfarmfresh@gmail.com"
+APP_PASSWORD = "vuouzdkhtoipvluv"
 
 def send_otp_email(recipient_email: str, otp: str):
     subject = "Your OTP Code"
