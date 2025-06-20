@@ -158,6 +158,7 @@ def delete_account(current_user: User = Depends(get_current_user), db: Session =
     current_user.email = ""
     current_user.username = ""
     db.commit()
+    print("Account deleted successfully")
     return {"message": "Account has been archived (soft deleted)"}
 
 

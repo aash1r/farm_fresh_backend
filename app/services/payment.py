@@ -121,7 +121,8 @@ class PaymentService:
         controller = createTransactionController(request)
         if self.sandbox_mode:
             controller.setenvironment(constants.SANDBOX)
-        controller.execute()
+        else:
+            controller.setenvironment(constants.PRODUCTION)
 
         response = controller.getresponse()
         logger.info("resultCode: %s", response.messages.resultCode)
