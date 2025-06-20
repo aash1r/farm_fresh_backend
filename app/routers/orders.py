@@ -161,9 +161,7 @@ def create_order(
 
         # Add order items
         for item_data in order_items_data:
-            item_data_copy = item_data.copy()
-            item_data_copy.pop("type", None)
-            db.add(OrderItem(order_id=order.id, **item_data_copy))
+            db.add(OrderItem(order_id=order.id, **item_data))
 
         db.commit()
         db.refresh(order)

@@ -33,7 +33,7 @@ def handle_regular_order_logic(db: Session, request: PayAndCreateOrderRequest) -
             "unit_price": product.price,
             "total_price": item_total,
             "variation_name": product.variation_name,
-            "type": product.type,
+            # "type": product.type,
         })
     return total, items
 
