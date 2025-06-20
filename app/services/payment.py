@@ -103,7 +103,9 @@ class PaymentService:
                 return False, f"API credentials invalid: {error_msg}"
                 
         except Exception as e:
-            print(f"API credentials test exception: {e}")
+            import traceback
+            full_trace = traceback.format_exc()
+            print(f"API test failed: {str(e)}\n{full_trace}")
             return False, f"API test failed: {str(e)}"
 
     def process_payment_token(
