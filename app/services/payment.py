@@ -127,25 +127,25 @@ class PaymentService:
         controller = createTransactionController(request)
         if self.sandbox_mode:
             controller.setenvironment(constants.SANDBOX)
-            logger.info("Using SANDBOX environment")
+            print("Using SANDBOX environment")
         else:
             controller.setenvironment(constants.PRODUCTION)
-            logger.info("Using PRODUCTION environment")
+            print("Using PRODUCTION environment")
 
-        logger.info("Executing transaction...")
+        print("Executing transaction...")
         response = controller.getresponse()
         
         if response is None:
-            logger.error("Received None response from Authorize.Net API")
+            print("Received None response from Authorize.Net API")
             return False, "No response from payment gateway. Please check your network connection and API credentials.", None
             
 
-        logger.info("resultCode: %s", response.messages.resultCode)
+        print("resultCode: %s", response.messages.resultCode)
         
         if hasattr(response, "transactionResponse"):
             tr = response.transactionResponse
-            logger.info("responseCode: %s", getattr(tr, "responseCode", None))
-            logger.info("authCode: %s", getattr(tr, "authCode", None))
+            print("responseCode: %s", getattr(tr, "responseCode", None))
+            print("authCode: %s", getattr(tr, "authCode", None))
             logger.info("messages: %s", getattr(tr, "messages", None))
             logger.info("errors: %s", getattr(tr, "errors", None))
             logger.info("raw transactionResponse: %s", tr)
@@ -157,7 +157,7 @@ class PaymentService:
             return True, "Payment processed successfully", str(trans_id)
         
         message = "Payment failed"
-        
+
         if response:
             try:
                 if hasattr(response, "transactionResponse") and hasattr(response.transactionResponse, "errors"):
