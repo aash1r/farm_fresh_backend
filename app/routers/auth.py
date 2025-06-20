@@ -155,8 +155,8 @@ def change_password(
 @router.delete("/delete-account")
 def delete_account(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     current_user.is_archived = True
-    current_user.email = None
-    current_user.username = None
+    current_user.email = ""
+    current_user.username = ""
     db.commit()
     return {"message": "Account has been archived (soft deleted)"}
 
