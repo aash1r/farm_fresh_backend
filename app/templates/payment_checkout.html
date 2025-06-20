@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Farm Fresh Shop – Payment</title>
-  <script type="text/javascript" src="https://js.authorize.net/v1/Accept.js" charset="utf-8"></script>
+  <script type="text/javascript" src="https://jstest.authorize.net/v1/Accept.js" charset="utf-8"></script>
   <style>
       * {
           box-sizing: border-box;
@@ -388,8 +388,8 @@
   </div>
 
 <script>
-  const CLIENT_KEY = "86gnR3CYttYFXy4E2qv393985zCQ5SCDupA8PXdQBVRqTwyc6RC7Kk4s763cc92a";
-  const API_LOGIN_ID = "9V4Jzd49";
+  const CLIENT_KEY = "7z7qqNqC857FB2x24keSAA4dbA2yUPh9x2UHtdkt4kR54AG5HVPUKYa3r9RTRdjL";
+  const API_LOGIN_ID = "4td4BU4F";
   // Amount injected by backend as string to avoid lint errors, then parsed
   const urlParams = new URLSearchParams(window.location.search);
   const AMOUNT = parseFloat(urlParams.get('amount')) || 0;
