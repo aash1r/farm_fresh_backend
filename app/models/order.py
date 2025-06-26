@@ -17,7 +17,7 @@ class DeliveryType(str, enum.Enum):
 
 class MangoType(str, enum.Enum):
     SINDHRI = "Sindhri"
-    LANGHRA = "Langhra"
+    LANGRA = "Langra"
     CHAUNSA = "Chaunsa"
     RATOL = "Ratol"
 

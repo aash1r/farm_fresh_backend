@@ -6,7 +6,7 @@ from enum import Enum
 class MangoType(str, Enum):
     """Types of mangoes available"""
     SINDHRI = "Sindhri"
-    LANGHRA = "Langhra"
+    LANGRA = "Langra"
     CHAUNSA = "Chaunsa"
     RATOL = "Ratol"
 
@@ -127,7 +127,7 @@ class DeliveryService:
                 return 620.0  # $31/box
             elif quantity == 24:
                 return 744.0  # $31/box
-        # Pricing for other mango types (Sindhri, Langhra, Chaunsa)
+        # Pricing for other mango types (Sindhri, Langra, Chaunsa)
         else:
             if quantity == 4:
                 return 144.0 

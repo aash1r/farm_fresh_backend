@@ -46,7 +46,7 @@ class MangoOrderItem(BaseModel):
         if v not in valid_types:
             raise ValueError(
                 f"Invalid mango type: {v}. "
-                f"Must be one of: Sindhri, Langhra, Chaunsa, or Ratol"
+                f"Must be one of: Sindhri, Langra, Chaunsa, or Ratol"
             )
         return v
 
