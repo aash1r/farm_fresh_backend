@@ -99,7 +99,7 @@ class DeliveryService:
         
     def get_pickup_allowed_quantities(self) -> List[int]:
         """Get allowed quantities for pickup delivery"""
-        return [8, 12, 16, 20, 24]
+        return [4, 8, 12, 16, 20, 24]
         
     def get_doorstep_allowed_quantities(self) -> List[int]:
         """Get allowed quantities for doorstep delivery"""
@@ -115,6 +115,8 @@ class DeliveryService:
             
         # Pricing for Ratol mangoes
         if mango_type == MangoType.RATOL.value:
+            if quantity == 4:
+                return 148.0  # $33/box
             if quantity == 8:
                 return 264.0  # $33/box
             elif quantity == 12:
@@ -127,6 +129,8 @@ class DeliveryService:
                 return 744.0  # $31/box
         # Pricing for other mango types (Sindhri, Langhra, Chaunsa)
         else:
+            if quantity == 4:
+                return 144.0 
             if quantity == 8:
                 return 256.0  # $32/box
             elif quantity == 12:
@@ -317,8 +321,8 @@ class DeliveryService:
         # Pickup delivery validation
         if delivery_type == "pickup":
             # Rule: Minimum 8 boxes
-            if total_quantity < 8:
-                return False, "Pickup orders require a minimum of 8 boxes", 0.0
+            if total_quantity < 4:
+                return False, "Pickup orders require a minimum of 4 boxes", 0.0
                 
             # Rule: No mixing of types
             if len(mango_types) > 1:
