@@ -1,6 +1,9 @@
 import smtplib
+import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 EMAIL_ADDRESS = "rizwanfarmfresh@gmail.com"
 APP_PASSWORD = "vuouzdkhtoipvluv"
@@ -32,7 +35,8 @@ def send_order_email(
     shipping_state: str,
     shipping_zip: str,
     airport_name: str,
-    items: list[dict]
+    items: list[dict],
+    pdf_attachment_path: str = None
 ):
     subject = f"🧾 New Order Placed - {order_number}"
 
@@ -63,6 +67,8 @@ A new order has been successfully placed.
 💰 Total Amount: ${total_amount:.2f}
 
 📦 Order Number: {order_number}
+
+📎 Please find the detailed orders report attached as a PDF file.
 """
 
     msg = MIMEMultipart()
@@ -70,6 +76,24 @@ A new order has been successfully placed.
     msg["To"] = recipient_email
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
+
+    if pdf_attachment_path and os.path.exists(pdf_attachment_path):
+        try:
+            with open(pdf_attachment_path, "rb") as attachment:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(attachment.read())
+                
+            encoders.encode_base64(part)
+            filename = os.path.basename(pdf_attachment_path)
+            part.add_header(
+                'Content-Disposition',
+                f'attachment; filename= {filename}'
+            )
+            
+            msg.attach(part)
+            print(f"PDF attachment added: {filename}")
+        except Exception as e:
+            print(f"Failed to attach PDF: {e}")
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(EMAIL_ADDRESS, APP_PASSWORD)

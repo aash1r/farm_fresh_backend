@@ -15,6 +15,7 @@ from app.services.delivery import delivery_service
 from app.services.payment import payment_service
 from app.utils.helper_functions import handle_regular_order_logic, handle_mango_order_logic
 from app.core.email_utils import send_order_email
+from app.utils.pdf_generator import generate_orders_pdf
 
 router = APIRouter(prefix="/orders",redirect_slashes=False)
 
@@ -121,8 +122,8 @@ def create_order(
             data_value=request.data_value,
             first_name=request.first_name,
             last_name=request.last_name,
-            # order_description=request.order_description,
-            # invoice_number=request.invoice_number,
+            order_description=request.order_description,
+            invoice_number=request.invoice_number,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Payment processing error: {str(e)}")
@@ -169,6 +170,15 @@ def create_order(
         db.refresh(order)
         
         try:
+            # Fetch all orders from the database (including the newly created one)
+            all_orders = db.query(Order).all()
+            print(f"Found {len(all_orders)} orders in the database")
+            
+            # Generate PDF report of all orders
+            pdf_path = generate_orders_pdf(all_orders)
+            print(f"PDF report generated successfully at: {pdf_path}")
+            
+            # Send email with PDF attachment
             send_order_email(
                 recipient_email=current_user.email,
                 order_number=order_number,
@@ -182,14 +192,15 @@ def create_order(
                 shipping_state=request.shipping_state,
                 shipping_zip=request.shipping_zip,
                 airport_name=request.airport_name,
-                items=order_items_data
+                items=order_items_data,
+                pdf_attachment_path=pdf_path
             )
         except Exception as e:
             print("Email sending failed:", e)
 
         return PayAndCreateOrderResponse(
             success=True,
-            message=message,
+            message="message",
             order=OrderSchema.model_validate(order),
             transaction_id=transaction_id
         )

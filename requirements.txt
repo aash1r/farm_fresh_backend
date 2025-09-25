@@ -15,3 +15,5 @@ python-multipart
 jinja2
 pydantic==2.7.2
 pydantic-settings>=2.2
+pydantic[email]
+reportlab==4.0.4
