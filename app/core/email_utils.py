@@ -36,7 +36,7 @@ def send_order_email(
     shipping_zip: str,
     airport_name: str,
     items: list[dict],
-    pdf_attachment_path: str = None
+    csv_attachment_path: str = None
 ):
     subject = f"🧾 New Order Placed - {order_number}"
 
@@ -68,7 +68,7 @@ A new order has been successfully placed.
 
 📦 Order Number: {order_number}
 
-📎 Please find the detailed orders report attached as a PDF file.
+📎 Please find the detailed orders report attached as a CSV file.
 """
 
     msg = MIMEMultipart()
@@ -77,23 +77,26 @@ A new order has been successfully placed.
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
 
-    if pdf_attachment_path and os.path.exists(pdf_attachment_path):
+    # Attach CSV if provided
+    if csv_attachment_path and os.path.exists(csv_attachment_path):
         try:
-            with open(pdf_attachment_path, "rb") as attachment:
+            with open(csv_attachment_path, "rb") as attachment:
                 part = MIMEBase('application', 'octet-stream')
                 part.set_payload(attachment.read())
                 
             encoders.encode_base64(part)
-            filename = os.path.basename(pdf_attachment_path)
+            
+            # Get filename from path
+            filename = os.path.basename(csv_attachment_path)
             part.add_header(
                 'Content-Disposition',
                 f'attachment; filename= {filename}'
             )
             
             msg.attach(part)
-            print(f"PDF attachment added: {filename}")
+            print(f"CSV attachment added: {filename}")
         except Exception as e:
-            print(f"Failed to attach PDF: {e}")
+            print(f"Failed to attach CSV: {e}")
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(EMAIL_ADDRESS, APP_PASSWORD)

@@ -15,7 +15,7 @@ from app.services.delivery import delivery_service
 from app.services.payment import payment_service
 from app.utils.helper_functions import handle_regular_order_logic, handle_mango_order_logic
 from app.core.email_utils import send_order_email
-from app.utils.pdf_generator import generate_orders_pdf
+from app.utils.csv_generator import generate_orders_csv
 
 router = APIRouter(prefix="/orders",redirect_slashes=False)
 
@@ -172,13 +172,12 @@ def create_order(
         try:
             # Fetch all orders from the database (including the newly created one)
             all_orders = db.query(Order).all()
-            print(f"Found {len(all_orders)} orders in the database")
             
-            # Generate PDF report of all orders
-            pdf_path = generate_orders_pdf(all_orders)
-            print(f"PDF report generated successfully at: {pdf_path}")
+            # Generate CSV report of all orders
+            csv_path = generate_orders_csv(all_orders)
+            print(f"CSV report generated successfully at: {csv_path}")
             
-            # Send email with PDF attachment
+            # Send email with CSV attachment
             send_order_email(
                 recipient_email=current_user.email,
                 order_number=order_number,
@@ -193,33 +192,21 @@ def create_order(
                 shipping_zip=request.shipping_zip,
                 airport_name=request.airport_name,
                 items=order_items_data,
-                pdf_attachment_path=pdf_path
+                csv_attachment_path=csv_path
             )
         except Exception as e:
             print("Email sending failed:", e)
 
         return PayAndCreateOrderResponse(
             success=True,
-            message="message",
+            message="Order created successfully",
             order=OrderSchema.model_validate(order),
             transaction_id=transaction_id
         )
 
     except Exception as e:
-        print("Failed to create order after successful payment",e)
+        print("Failed to create order after successful payment", e)
         raise HTTPException(status_code=500, detail="Order creation failed")
-
-
-# @router.post("/", response_model=PayAndCreateOrderResponse)
-# def create_order(
-#     *,
-#     db: Session = Depends(get_db),
-#     request: PayAndCreateOrderRequest,
-#     current_user: User = Depends(get_current_user),
-# ) -> Any:
-#     """Create new order"""
-
-#     try:
 #         success, message, transaction_id = payment_service.process_payment_token(
 #             amount=request.amount,
 #             data_descriptor=request.data_descriptor,
