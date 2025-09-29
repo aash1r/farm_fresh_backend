@@ -1,0 +1,51 @@
+Order Number,Order Date,Status,Delivery Type,Total Amount,Customer ID,Payment ID,Shipping Address,Shipping State,Shipping ZIP,Airport Name,Airport Code,Is Mango Delivery,Created At,Updated At
+ORD-000001,2025-09-29,processing,pickup,24293.19,20,PAY-00000001,"House # 494, Phillips Divide",Gilgit-Baltistan,23266,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000002,2025-09-29,delivered,pickup,8936.88,12,PAY-00000002,"House # 882, Le Throughway",KPK,77749,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000003,2025-09-29,delivered,pickup,7806.94,9,PAY-00000003,"House # 669, Miller Brooks",Punjab,21594,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000004,2025-09-29,shipped,pickup,11299.25,16,PAY-00000004,"House # 870, Armstrong Station",Balochistan,84208,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000005,2025-09-29,processing,doorstep,8628.66,15,PAY-00000005,"House # 844, Cruz Flat",KPK,94341,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000006,2025-09-29,shipped,pickup,2646.12,9,PAY-00000006,"House # 560, Walker Orchard",Punjab,49794,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000007,2025-09-29,shipped,doorstep,4458.20,1,PAY-00000007,"House # 524, Cory Junction",Gilgit-Baltistan,49366,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000008,2025-09-29,processing,doorstep,13696.55,17,PAY-00000008,"House # 369, Schmitt Square",Balochistan,52933,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000009,2025-09-29,delivered,pickup,8884.54,11,PAY-00000009,"House # 355, Erin Dale",KPK,96767,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000010,2025-09-29,shipped,doorstep,14404.81,10,PAY-00000010,"House # 62, Martinez Loop",Gilgit-Baltistan,93833,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000011,2025-09-29,delivered,pickup,9939.42,18,PAY-00000011,"House # 264, Rhonda Square",Sindh,68017,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000012,2025-09-29,processing,doorstep,9275.95,18,PAY-00000012,"House # 178, Eric Walk",Gilgit-Baltistan,76521,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000013,2025-09-29,delivered,pickup,15814.31,10,PAY-00000013,"House # 850, Connie Village",Sindh,98283,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000014,2025-09-29,delivered,pickup,21138.57,14,PAY-00000014,"House # 53, Sherry Circle",Balochistan,71373,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000015,2025-09-29,processing,doorstep,4490.42,9,PAY-00000015,"House # 626, Ramirez Common",KPK,88942,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000016,2025-09-29,processing,doorstep,26526.90,2,PAY-00000016,"House # 19, Jason Landing",KPK,28188,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000017,2025-09-29,delivered,doorstep,4405.32,13,PAY-00000017,"House # 418, West Manors",Balochistan,51092,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000018,2025-09-29,shipped,pickup,1532.50,15,PAY-00000018,"House # 993, Whitney Ville",Gilgit-Baltistan,93241,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000019,2025-09-29,processing,pickup,4290.82,13,PAY-00000019,"House # 409, Calhoun Haven",Gilgit-Baltistan,58162,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000020,2025-09-29,shipped,doorstep,3203.50,3,PAY-00000020,"House # 283, Doris Viaduct",Balochistan,13787,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000021,2025-09-29,shipped,pickup,6516.23,19,PAY-00000021,"House # 52, Rice Centers",Punjab,62940,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000022,2025-09-29,delivered,pickup,7989.11,7,PAY-00000022,"House # 757, Duran Walks",KPK,69620,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000023,2025-09-29,delivered,pickup,4310.99,4,PAY-00000023,"House # 470, Davis Loaf",Punjab,37735,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000024,2025-09-29,processing,pickup,25001.39,8,PAY-00000024,"House # 78, Harris Causeway",Gilgit-Baltistan,73822,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000025,2025-09-29,processing,doorstep,22690.24,3,PAY-00000025,"House # 195, Gonzalez Cliff",Punjab,40198,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000026,2025-09-29,processing,doorstep,15299.32,14,PAY-00000026,"House # 9, Jared Keys",Balochistan,18333,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000027,2025-09-29,processing,pickup,28450.37,15,PAY-00000027,"House # 789, Kimberly Loop",Sindh,95240,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000028,2025-09-29,shipped,doorstep,14994.38,5,PAY-00000028,"House # 444, Campbell Mall",Sindh,68809,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000029,2025-09-29,delivered,pickup,18319.56,15,PAY-00000029,"House # 907, Donna Stravenue",KPK,82637,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000030,2025-09-29,shipped,doorstep,5882.21,16,PAY-00000030,"House # 131, Howell Highway",Sindh,10156,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000031,2025-09-29,delivered,doorstep,3336.19,14,PAY-00000031,"House # 12, Julie Garden",Sindh,93923,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000032,2025-09-29,shipped,doorstep,20777.08,2,PAY-00000032,"House # 67, Bishop Glen",KPK,76801,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000033,2025-09-29,shipped,pickup,22521.39,6,PAY-00000033,"House # 767, Monica Hills",Balochistan,14350,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000034,2025-09-29,delivered,pickup,15721.40,12,PAY-00000034,"House # 273, Meyer Lock",Sindh,33070,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000035,2025-09-29,shipped,pickup,9625.96,18,PAY-00000035,"House # 356, Oconnor Curve",Balochistan,34377,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000036,2025-09-29,delivered,pickup,22339.71,19,PAY-00000036,"House # 89, Austin Common",Sindh,12776,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000037,2025-09-29,processing,doorstep,14890.46,10,PAY-00000037,"House # 564, Todd Extensions",Punjab,11965,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000038,2025-09-29,processing,doorstep,24829.76,7,PAY-00000038,"House # 794, Chris Rue",Balochistan,94093,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000039,2025-09-29,delivered,pickup,13098.48,13,PAY-00000039,"House # 766, Kimberly Shore",Gilgit-Baltistan,53881,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000040,2025-09-29,shipped,doorstep,18595.57,5,PAY-00000040,"House # 254, King Ridge",KPK,22837,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000041,2025-09-29,delivered,pickup,27878.37,15,PAY-00000041,"House # 702, Dawn Bridge",KPK,47000,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000042,2025-09-29,delivered,doorstep,15412.67,7,PAY-00000042,"House # 616, Mcgee Creek",Punjab,10240,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000043,2025-09-29,shipped,doorstep,15743.30,19,PAY-00000043,"House # 389, Tonya Place",Punjab,56373,Islamabad International Airport,ISB,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000044,2025-09-29,shipped,pickup,22616.99,20,PAY-00000044,"House # 433, Robert Crescent",Balochistan,77363,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000045,2025-09-29,shipped,doorstep,7014.12,3,PAY-00000045,"House # 536, Coleman Skyway",Punjab,80613,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000046,2025-09-29,processing,pickup,15939.26,8,PAY-00000046,"House # 694, Barbara Light",Sindh,69403,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000047,2025-09-29,delivered,pickup,6260.73,5,PAY-00000047,"House # 8, Cannon Valley",Balochistan,77847,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000048,2025-09-29,delivered,doorstep,6468.83,14,PAY-00000048,"House # 953, Samantha Plain",Punjab,73165,Jinnah International Airport,KHI,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000049,2025-09-29,shipped,pickup,33368.30,15,PAY-00000049,"House # 232, White Streets",Sindh,44182,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
+ORD-000050,2025-09-29,shipped,pickup,18309.30,10,PAY-00000050,"House # 401, Ellis Rapid",Balochistan,81939,Allama Iqbal International Airport,LHE,Yes,2025-09-29 17:52:51,2025-09-29 17:52:51
