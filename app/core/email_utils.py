@@ -5,10 +5,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
-# EMAIL_ADDRESS = "rizwanfarmfresh@gmail.com"
-# APP_PASSWORD = "vuouzdkhtoipvluv"
-EMAIL_ADDRESS = "asheressani@gmail.com"
-APP_PASSWORD = "pkhn nfdv urgx gwkd"
+EMAIL_ADDRESS = "rizwanfarmfresh@gmail.com"
+APP_PASSWORD = "vuouzdkhtoipvluv"
+# EMAIL_ADDRESS = "asheressani@gmail.com"
+# APP_PASSWORD = "pkhn nfdv urgx gwkd"
 
 
 def send_otp_email(recipient_email: str, otp: str):
